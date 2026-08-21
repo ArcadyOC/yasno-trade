@@ -244,31 +244,32 @@
                     <span class="text-xs font-bold text-slate-400 dark:text-slate-400 uppercase tracking-wider min-w-[120px]">Суммарный профит</span>
                     <!-- Переключатель периодов -->
                     <div class="flex bg-slate-200/50 dark:bg-slate-800/50 rounded-lg p-0.5 border border-slate-300/40 dark:border-white/5 text-[10px] font-semibold flex-shrink-0 w-full sm:w-auto">
-                        <button onclick="setPeriod(this, 'all', 148.5)" class="px-2 py-1 rounded-md bg-white dark:bg-slate-700 text-slate-800 dark:text-white shadow-sm transition-all period-btn active-period flex-1 sm:flex-none">Всё время</button>
-                        <button onclick="setPeriod(this, 'month', 84.2)" class="px-2 py-1 rounded-md text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 transition-all period-btn flex-1 sm:flex-none">Месяц</button>
-                        <button onclick="setPeriod(this, 'week', 21.4)" class="px-2 py-1 rounded-md text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 transition-all period-btn flex-1 sm:flex-none">Неделя</button>
+                        <button onclick="setPeriod(this, 'all')" class="px-2 py-1 rounded-md bg-white dark:bg-slate-700 text-slate-800 dark:text-white shadow-sm transition-all period-btn active-period flex-1 sm:flex-none">Всё время</button>
+                        <button onclick="setPeriod(this, 'month')" class="px-2 py-1 rounded-md text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 transition-all period-btn flex-1 sm:flex-none">Месяц</button>
+                        <button onclick="setPeriod(this, 'week')" class="px-2 py-1 rounded-md text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 transition-all period-btn flex-1 sm:flex-none">Неделя</button>
                     </div>
                 </div>
 
                 <div class="flex items-end justify-between w-full z-10">
                     <div class="flex flex-col relative">
                         <div class="group/tooltip flex flex-col w-fit relative cursor-help z-50">
-                            <span id="total-profit-val" class="text-2xl sm:text-3xl font-extrabold text-emerald-600 dark:text-emerald-400 tracking-tight transition-all duration-300 border-b border-dashed border-emerald-500/50 pb-0.5 whitespace-nowrap">+148.5 R</span>
+                            <span id="total-profit-val" class="text-2xl sm:text-3xl font-extrabold text-emerald-600 dark:text-emerald-400 tracking-tight transition-all duration-300 border-b border-dashed border-emerald-500/50 pb-0.5 whitespace-nowrap">— R</span>
                             
                             <!-- Всплывающая подсказка (Tooltip) -->
                             <div class="absolute top-full left-0 mt-3 w-[calc(100vw-3rem)] max-w-[280px] sm:max-w-[320px] p-3.5 bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl border border-slate-200 dark:border-white/10 rounded-xl shadow-2xl opacity-0 invisible group-hover/tooltip:opacity-100 group-hover/tooltip:visible transition-all duration-200 text-[11px] sm:text-xs leading-relaxed text-slate-600 dark:text-slate-300 pointer-events-none translate-y-2 group-hover/tooltip:translate-y-0 z-[100]">
                                 Показатель отражает чистый результат работы алгоритмов: сумму всех прибыльных отработок за вычетом тех сценариев, которые ушли в минус. Мы считаем результат в R, а не в деньгах, чтобы объективно показать математику стратегий независимо от размера вашего депозита.
                             </div>
                         </div>
-                        <span class="text-[11px] font-medium text-emerald-700/70 dark:text-emerald-400/70 mt-1.5 flex items-center gap-1 whitespace-nowrap">
-                            <i class="ph-bold ph-trend-up"></i> Высокий темп прироста
+                        <span id="hero-profit-caption" class="text-[11px] font-medium text-emerald-700/70 dark:text-emerald-400/70 mt-1.5 flex items-center gap-1 whitespace-nowrap">
+                            <i class="ph-bold ph-trend-up"></i>
+                            <span id="hero-profit-caption-text">Загрузка демо-ботов</span>
                         </span>
                     </div>
                     <!-- Sparkline (Мини-график) -->
                     <div class="w-16 sm:w-20 h-10 ml-2 relative opacity-80 flex-shrink-0">
                         <svg viewBox="0 0 100 30" class="w-full h-full stroke-emerald-500 fill-none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M5,25 Q15,20 25,22 T45,15 T65,18 T85,5 L95,2" />
-                            <path d="M5,25 Q15,20 25,22 T45,15 T65,18 T85,5 L95,2 L95,30 L5,30 Z" class="fill-emerald-500/10 stroke-none" />
+                            <path id="hero-spark-line" d="M5,15 L95,15" />
+                            <path id="hero-spark-area" d="M5,15 L95,15 L95,30 L5,30 Z" class="fill-emerald-500/10 stroke-none" />
                         </svg>
                     </div>
                 </div>
@@ -289,16 +290,16 @@
 
                 <div class="flex items-end justify-between w-full z-10">
                     <div class="flex flex-col relative">
-                        <span class="text-2xl sm:text-3xl font-extrabold text-slate-800 dark:text-white tracking-tight whitespace-nowrap">69.4%</span>
-                        <span class="text-[11px] font-medium text-slate-500 dark:text-slate-400 mt-1.5 flex items-center gap-1 whitespace-nowrap">
-                            Точность сигналов
+                        <span id="hero-wr-val" class="text-2xl sm:text-3xl font-extrabold text-slate-800 dark:text-white tracking-tight whitespace-nowrap">—%</span>
+                        <span id="hero-wr-label" class="text-[11px] font-medium text-slate-500 dark:text-slate-400 mt-1.5 flex items-center gap-1 whitespace-nowrap">
+                            Доля сетапов до цели
                         </span>
                     </div>
                     <!-- Mini Gauge -->
                     <div class="w-10 h-10 ml-2 relative opacity-90 flex-shrink-0 drop-shadow-sm">
                         <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
                             <circle cx="18" cy="18" r="15.915" fill="transparent" stroke="currentColor" stroke-width="4" class="text-slate-200 dark:text-slate-700/50"></circle>
-                            <circle cx="18" cy="18" r="15.915" fill="transparent" stroke="currentColor" stroke-width="4" stroke-dasharray="69.4, 100" stroke-linecap="round" class="text-cyan-500"></circle>
+                            <circle id="hero-wr-gauge" cx="18" cy="18" r="15.915" fill="transparent" stroke="currentColor" stroke-width="4" stroke-dasharray="0, 100" stroke-linecap="round" class="text-cyan-500"></circle>
                         </svg>
                     </div>
                 </div>
@@ -320,14 +321,14 @@
                 <div class="flex items-end justify-between w-full z-10">
                     <div class="flex flex-col relative">
                         <span class="text-2xl sm:text-3xl font-extrabold text-slate-800 dark:text-white tracking-tight flex items-baseline gap-1.5 whitespace-nowrap">
-                            5 <span class="text-sm font-semibold text-slate-400 dark:text-slate-500">/ 12</span>
+                            <span id="hero-agents-online">—</span> <span class="text-sm font-semibold text-slate-400 dark:text-slate-500">/ <span id="hero-agents-total">5</span></span>
                         </span>
-                        <span class="text-[11px] font-medium text-emerald-600 dark:text-emerald-400 mt-1.5 flex items-center gap-1.5 whitespace-nowrap">
+                        <span id="hero-agents-label" class="text-[11px] font-medium text-emerald-600 dark:text-emerald-400 mt-1.5 flex items-center gap-1.5 whitespace-nowrap">
                             <span class="relative flex h-2 w-2">
                                 <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                                 <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                             </span>
-                            Системы онлайн
+                                <span id="hero-agents-label-text">Системы онлайн</span>
                         </span>
                     </div>
                     <!-- Иконки ботов -->
@@ -811,25 +812,65 @@
 
     // --- НОВЫЙ ИНТЕРАКТИВНЫЙ ФУНКЦИОНАЛ ---
 
-    // 1. Переключение периодов профита
-    function setPeriod(btn, period, value) {
-        // Убираем активный класс у всех кнопок
+    let heroData = null;
+    let heroPeriod = 'all';
+
+    function formatR(value) {
+        const n = Number(value) || 0;
+        const abs = Math.abs(n).toFixed(1);
+        return (n > 0 ? '+' : n < 0 ? '−' : '') + abs + ' R';
+    }
+
+    function applyHero(period) {
+        if (!heroData) return;
+        heroPeriod = period;
+        const profit = heroData.profit[period];
+        const wr = heroData.realization[period];
+        const spark = heroData.profit.sparkline[period];
+        const valEl = document.getElementById('total-profit-val');
+        valEl.innerText = formatR(profit);
+        valEl.classList.toggle('text-emerald-600', profit >= 0);
+        valEl.classList.toggle('dark:text-emerald-400', profit >= 0);
+        valEl.classList.toggle('text-rose-500', profit < 0);
+        valEl.classList.toggle('dark:text-rose-400', profit < 0);
+        document.getElementById('hero-profit-caption-text').innerText = heroData.profit.caption || '';
+        document.getElementById('hero-spark-line').setAttribute('d', spark.line);
+        document.getElementById('hero-spark-area').setAttribute('d', spark.area);
+        document.getElementById('hero-wr-val').innerText = wr.toFixed(1) + '%';
+        document.getElementById('hero-wr-label').innerText = heroData.realization.label;
+        document.getElementById('hero-wr-gauge').setAttribute('stroke-dasharray', wr + ', 100');
+        document.getElementById('hero-agents-online').innerText = heroData.agents.online;
+        document.getElementById('hero-agents-total').innerText = heroData.agents.total;
+        document.getElementById('hero-agents-label-text').innerText = heroData.agents.label;
+    }
+
+    function setPeriod(btn, period) {
         document.querySelectorAll('.period-btn').forEach(b => {
             b.classList.remove('bg-white', 'dark:bg-slate-700', 'text-slate-800', 'dark:text-white', 'shadow-sm', 'active-period');
             b.classList.add('text-slate-500', 'dark:text-slate-400');
         });
-        // Добавляем нажатой кнопке
         btn.classList.add('bg-white', 'dark:bg-slate-700', 'text-slate-800', 'dark:text-white', 'shadow-sm', 'active-period');
         btn.classList.remove('text-slate-500', 'dark:text-slate-400');
-        
-        // Анимация смены числа
         const valEl = document.getElementById('total-profit-val');
         valEl.style.opacity = '0';
         setTimeout(() => {
-            valEl.innerText = `+${value} R`;
+            applyHero(period);
             valEl.style.opacity = '1';
         }, 200);
     }
+
+    async function loadHero() {
+        try {
+            const res = await fetch('data/lab_hero.json?t=' + Date.now());
+            if (!res.ok) throw new Error('hero json missing');
+            heroData = await res.json();
+            applyHero(heroPeriod);
+        } catch (err) {
+            document.getElementById('hero-profit-caption-text').innerText = 'Нет связи со сводкой демо-ботов';
+        }
+    }
+
+    loadHero();
 
     // 2. Drill-down для ботов (Раскрывающийся аккордеон)
     function toggleBotDetails(botId) {
