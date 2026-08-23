@@ -1,9 +1,9 @@
 {
-  "updated_at": "2026-08-21T20:44:33",
+  "updated_at": "2026-08-23T13:23:42",
   "source": "C:\\Users\\pushi\\Desktop\\kvant_lab\\demo_bots",
   "profit": {
     "all": 26.8,
-    "month": 3.9,
+    "month": 4.9,
     "week": 1.4,
     "caption": "Высокий темп прироста",
     "caption_tone": "up",
@@ -27,11 +27,11 @@
   },
   "realization": {
     "all": 44.8,
-    "month": 36.5,
+    "month": 37.0,
     "week": 33.3,
     "closed_all": 154,
     "wins_all": 69,
-    "label": "Доля сетапов до цели"
+    "label": "Как часто до цели"
   },
   "agents": {
     "online": 5,
@@ -40,49 +40,188 @@
   },
   "activity": {
     "trades_per_week_all": 15.2,
-    "trades_per_week_month": 17.9,
+    "trades_per_week_month": 20.4,
     "trades_week_count": 18
   },
   "bots": [
     {
-      "name": "idea-004-observe",
-      "online": true,
-      "closed": 8,
-      "wins": 2,
-      "sum_r": 0.7,
-      "win_rate_pct": 25.0
-    },
-    {
-      "name": "mv-m5-impulse",
-      "online": true,
-      "closed": 0,
-      "wins": 0,
-      "sum_r": 0,
-      "win_rate_pct": null
-    },
-    {
-      "name": "planner",
-      "online": true,
-      "closed": 22,
-      "wins": 11,
-      "sum_r": 1.7,
-      "win_rate_pct": 50.0
-    },
-    {
+      "id": "xau-trend",
       "name": "xau-trend",
+      "title": "Золото · тренд",
+      "metal": "Золото",
       "online": true,
+      "status": "live",
+      "status_label": "В работе",
+      "footnote": "85 закрытых · 8.9 в неделю",
       "closed": 85,
       "wins": 34,
       "sum_r": 19.4,
-      "win_rate_pct": 40.0
+      "week_r": 3.2,
+      "win_rate_pct": 40.0,
+      "trades_per_week": 8.9,
+      "sparkline": {
+        "line": "M5.0,5.0 11.0,8.0 17.0,11.0 23.0,14.0 29.0,17.0 35.0,10.3 41.0,13.3 47.0,16.3 53.0,19.3 59.0,20.1 65.0,23.0 71.0,26.0 77.0,19.2 83.0,17.7 89.0,10.8 95.0,4.0",
+        "area": "M5.0,5.0 11.0,8.0 17.0,11.0 23.0,14.0 29.0,17.0 35.0,10.3 41.0,13.3 47.0,16.3 53.0,19.3 59.0,20.1 65.0,23.0 71.0,26.0 77.0,19.2 83.0,17.7 89.0,10.8 95.0,4.0 L95.0,30 L5,30 Z",
+        "positive": true
+      },
+      "recent": [
+        {
+          "label": "Золото",
+          "r": 2.4,
+          "when": "21.08 19:45"
+        },
+        {
+          "label": "Золото",
+          "r": 2.4,
+          "when": "21.08 19:20"
+        },
+        {
+          "label": "Золото",
+          "r": 0.5,
+          "when": "21.08 01:15"
+        }
+      ],
+      "last_exit": "21.08 19:45"
     },
     {
+      "id": "xag-trend",
       "name": "xag-trend",
+      "title": "Серебро · тренд",
+      "metal": "Серебро",
       "online": true,
+      "status": "live",
+      "status_label": "В работе",
+      "footnote": "39 закрытых · 3.8 в неделю",
       "closed": 39,
       "wins": 22,
       "sum_r": 5.1,
-      "win_rate_pct": 56.4
+      "week_r": -0.2,
+      "win_rate_pct": 56.4,
+      "trades_per_week": 3.8,
+      "sparkline": {
+        "line": "M5.0,9.7 11.0,6.8 17.0,4.1 23.0,7.4 29.0,10.9 35.0,5.7 41.0,4.0 47.0,7.2 53.0,10.3 59.0,13.4 65.0,16.7 71.0,19.8 77.0,22.9 83.0,26.0 89.0,20.3 95.0,23.4",
+        "area": "M5.0,9.7 11.0,6.8 17.0,4.1 23.0,7.4 29.0,10.9 35.0,5.7 41.0,4.0 47.0,7.2 53.0,10.3 59.0,13.4 65.0,16.7 71.0,19.8 77.0,22.9 83.0,26.0 89.0,20.3 95.0,23.4 L95.0,30 L5,30 Z",
+        "positive": true
+      },
+      "recent": [
+        {
+          "label": "Серебро",
+          "r": -1.0,
+          "when": "21.08 15:15"
+        },
+        {
+          "label": "Серебро",
+          "r": 1.9,
+          "when": "21.08 11:30"
+        },
+        {
+          "label": "Серебро",
+          "r": -1.1,
+          "when": "20.08 10:15"
+        }
+      ],
+      "last_exit": "21.08 15:15"
+    },
+    {
+      "id": "planner",
+      "name": "planner",
+      "title": "Оба металла · цепочка",
+      "metal": "Золото и серебро",
+      "online": true,
+      "status": "stale",
+      "status_label": "Давно без закрытий",
+      "footnote": "Последнее закрытие больше 10 дней назад",
+      "closed": 22,
+      "wins": 11,
+      "sum_r": 1.7,
+      "week_r": 0,
+      "win_rate_pct": 50.0,
+      "trades_per_week": 3.1,
+      "sparkline": {
+        "line": "M5.0,17.4 11.0,22.2 17.0,16.4 23.0,21.2 29.0,26.0 35.0,20.3 41.0,14.5 47.0,8.8 53.0,4.0 59.0,8.8 65.0,13.6 71.0,6.4 77.0,11.2 83.0,15.9 89.0,20.7 95.0,15.9",
+        "area": "M5.0,17.4 11.0,22.2 17.0,16.4 23.0,21.2 29.0,26.0 35.0,20.3 41.0,14.5 47.0,8.8 53.0,4.0 59.0,8.8 65.0,13.6 71.0,6.4 77.0,11.2 83.0,15.9 89.0,20.7 95.0,15.9 L95.0,30 L5,30 Z",
+        "positive": true
+      },
+      "recent": [
+        {
+          "label": "Золото",
+          "r": 1.0,
+          "when": "12.08 19:40"
+        },
+        {
+          "label": "Золото",
+          "r": -1.0,
+          "when": "12.08 04:00"
+        },
+        {
+          "label": "Золото",
+          "r": -1.0,
+          "when": "11.08 12:25"
+        }
+      ],
+      "last_exit": "12.08 19:40"
+    },
+    {
+      "id": "idea-004-observe",
+      "name": "idea-004-observe",
+      "title": "Серебро · наблюдение",
+      "metal": "Серебро",
+      "online": true,
+      "status": "live",
+      "status_label": "В работе",
+      "footnote": "8 закрытых · 3.7 в неделю",
+      "closed": 8,
+      "wins": 2,
+      "sum_r": 0.7,
+      "week_r": -1.7,
+      "win_rate_pct": 25.0,
+      "trades_per_week": 3.7,
+      "sparkline": {
+        "line": "M5.0,26.0 17.9,10.3 30.7,15.0 43.6,19.7 56.4,4.0 69.3,8.7 82.1,13.4 95.0,18.1",
+        "area": "M5.0,26.0 17.9,10.3 30.7,15.0 43.6,19.7 56.4,4.0 69.3,8.7 82.1,13.4 95.0,18.1 L95.0,30 L5,30 Z",
+        "positive": true
+      },
+      "recent": [
+        {
+          "label": "Серебро",
+          "r": -1.0,
+          "when": "21.08 17:30"
+        },
+        {
+          "label": "Серебро",
+          "r": -1.0,
+          "when": "20.08 15:45"
+        },
+        {
+          "label": "Серебро",
+          "r": -1.0,
+          "when": "20.08 11:15"
+        }
+      ],
+      "last_exit": "21.08 17:30"
+    },
+    {
+      "id": "mv-m5-impulse",
+      "name": "mv-m5-impulse",
+      "title": "Серебро · импульс",
+      "metal": "Серебро",
+      "online": true,
+      "status": "wait",
+      "status_label": "Ждёт",
+      "footnote": "Пока нет закрытых",
+      "closed": 0,
+      "wins": 0,
+      "sum_r": 0,
+      "week_r": 0,
+      "win_rate_pct": null,
+      "trades_per_week": 0.0,
+      "sparkline": {
+        "line": "M5,15 L95,15",
+        "area": "M5,15 L95,15 L95,30 L5,30 Z",
+        "positive": true
+      },
+      "recent": [],
+      "last_exit": null
     }
   ]
 }

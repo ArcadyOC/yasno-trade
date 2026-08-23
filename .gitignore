@@ -27,3 +27,4 @@ desktop.ini
 # Logs and local data dumps
 *.log
 logs/
+data/lab_users.db

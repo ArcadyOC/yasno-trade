@@ -10,6 +10,15 @@ from pathlib import Path
 KVANT_LAB = Path(r"C:\Users\pushi\Desktop\kvant_lab")
 OUT_PATH = Path(__file__).resolve().parents[1] / "data" / "lab_hero.json"
 ONLINE_MAX_AGE = timedelta(hours=2)
+STALE_AFTER = timedelta(days=10)
+
+BOT_FACES = {
+    "xau-trend": {"title": "Золото · тренд", "metal": "Золото"},
+    "xag-trend": {"title": "Серебро · тренд", "metal": "Серебро"},
+    "planner": {"title": "Оба металла · цепочка", "metal": "Золото и серебро"},
+    "idea-004-observe": {"title": "Серебро · наблюдение", "metal": "Серебро"},
+    "mv-m5-impulse": {"title": "Серебро · импульс", "metal": "Серебро"},
+}
 
 
 def _num(value):
@@ -89,11 +98,17 @@ def _iter_closed(name: str, payload: dict):
         if r_value is None:
             continue
         exit_at = _parse_dt(trade.get("exit_time") or trade.get("logged_at"))
+        symbol = str(trade.get("symbol") or "")
+        if not symbol and "xag" in name:
+            symbol = "XAGUSD"
+        elif not symbol and "xau" in name:
+            symbol = "XAUUSD"
         yield {
             "bot": name,
             "r": r_value,
             "win": _is_win(trade, r_value),
             "exit_at": exit_at,
+            "symbol": symbol or "—",
         }
 
 
@@ -214,16 +229,73 @@ def collect() -> dict:
         bot_r = sum(row["r"] for row in bot_closed)
         bot_wins = sum(1 for row in bot_closed if row["win"])
         n = len(bot_closed)
+        ordered = sorted(bot_closed, key=lambda x: x["exit_at"] or datetime.min)
+        last_exit = ordered[-1]["exit_at"] if ordered else None
+        week_closed = [row for row in bot_closed if row["exit_at"] and row["exit_at"] >= now - timedelta(days=7)]
+        times = [row["exit_at"] for row in bot_closed if row["exit_at"]]
+        if len(times) >= 2:
+            span_days = max((max(times) - min(times)).days, 1)
+            trades_per_week = n / (span_days / 7)
+        else:
+            trades_per_week = float(n)
+        stale = bool(last_exit and now - last_exit > STALE_AFTER)
+        if not is_online:
+            status, status_label, footnote = "offline", "Нет связи", "Процесс сейчас не отвечает"
+        elif n == 0:
+            status, status_label, footnote = "wait", "Ждёт", "Пока нет закрытых"
+        elif stale:
+            status, status_label, footnote = "stale", "Давно без закрытий", "Последнее закрытие больше 10 дней назад"
+        else:
+            status, status_label, footnote = (
+                "live",
+                "В работе",
+                f"{n} закрытых · {trades_per_week:.1f} в неделю",
+            )
+        acc, spark_pts = 0.0, []
+        for row in ordered:
+            acc += row["r"]
+            spark_pts.append(acc)
+        spark_pts = spark_pts[-16:]
+        recent = []
+        for row in reversed(ordered[-3:]):
+            metal = (
+                "Золото"
+                if "XAU" in row["symbol"]
+                else "Серебро"
+                if "XAG" in row["symbol"]
+                else BOT_FACES.get(name, {}).get("metal", "")
+            )
+            recent.append(
+                {
+                    "label": metal or row["symbol"],
+                    "r": round(row["r"], 1),
+                    "when": row["exit_at"].strftime("%d.%m %H:%M") if row["exit_at"] else "",
+                }
+            )
+        face = BOT_FACES.get(name, {"title": name, "metal": ""})
         per_bot.append(
             {
+                "id": name,
                 "name": name,
+                "title": face["title"],
+                "metal": face["metal"],
                 "online": is_online,
+                "status": status,
+                "status_label": status_label,
+                "footnote": footnote,
                 "closed": n,
                 "wins": bot_wins,
                 "sum_r": round(bot_r, 1),
+                "week_r": round(sum(row["r"] for row in week_closed), 1),
                 "win_rate_pct": round(100 * bot_wins / n, 1) if n else None,
+                "trades_per_week": round(trades_per_week, 1),
+                "sparkline": _sparkline(spark_pts),
+                "recent": recent,
+                "last_exit": last_exit.strftime("%d.%m %H:%M") if last_exit else None,
             }
         )
+
+    per_bot.sort(key=lambda bot: (bot["sum_r"], bot["closed"]), reverse=True)
 
     all_stats = _period_stats(closed, None)
     month_stats = _period_stats(closed, now - timedelta(days=30))
@@ -265,7 +337,7 @@ def collect() -> dict:
             "week": week_stats["win_rate_pct"],
             "closed_all": all_stats["closed"],
             "wins_all": all_stats["wins"],
-            "label": "Доля сетапов до цели",
+            "label": "Как часто до цели",
         },
         "agents": {
             "online": online,
@@ -293,8 +365,13 @@ def main():
     print(
         f"WR {snapshot['realization']['all']}%  "
         f"agents {snapshot['agents']['online']}/{snapshot['agents']['total']}  "
-        f"сделок/нед {snapshot['activity']['trades_per_week_all']}"
+        f"в неделю {snapshot['activity']['trades_per_week_all']}"
     )
+    for bot in snapshot["bots"]:
+        print(
+            f"  {bot['title']}: {bot['sum_r']} R  {bot['status_label']}  "
+            f"{bot['closed']} закр.  {bot['trades_per_week']}/нед"
+        )
 
 
 if __name__ == "__main__":

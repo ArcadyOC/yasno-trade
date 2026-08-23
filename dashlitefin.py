@@ -185,11 +185,203 @@
         @keyframes shimmer {
             100% { transform: translateX(100%); }
         }
+
+        .ai-dock {
+            position: fixed;
+            right: max(1.25rem, calc((100vw - 72rem) / 2));
+            bottom: 1.5rem;
+            z-index: 80;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 0.85rem;
+        }
+
+        .ai-backdrop {
+            position: fixed;
+            inset: 0;
+            z-index: 70;
+            background: rgba(15, 23, 42, 0.18);
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transition: opacity 0.28s ease, visibility 0.28s ease;
+        }
+
+        .dark .ai-backdrop {
+            background: rgba(2, 6, 23, 0.45);
+        }
+
+        body.ai-open .ai-backdrop {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+        }
+
+        .ai-orb {
+            position: relative;
+            width: 4.35rem;
+            height: 4.35rem;
+            border-radius: 999px;
+            border: none;
+            cursor: pointer;
+            color: #fff;
+            background: radial-gradient(circle at 32% 28%, #a5f3fc 0%, #22d3ee 38%, #06b6d4 62%, #10b981 100%);
+            box-shadow:
+                0 0 0 0 rgba(34, 211, 238, 0.45),
+                0 0 22px 6px rgba(6, 182, 212, 0.5),
+                0 0 48px 14px rgba(16, 185, 129, 0.28);
+            animation: ai-orb-pulse 3.6s ease-in-out infinite;
+            z-index: 2;
+        }
+
+        .ai-orb:focus-visible {
+            outline: 2px solid #22d3ee;
+            outline-offset: 4px;
+        }
+
+        .ai-orb-core {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .ai-orb-core i { font-size: 1.7rem; }
+
+        .ai-orb::before,
+        .ai-orb::after {
+            content: '';
+            position: absolute;
+            inset: -11px;
+            border-radius: 999px;
+            border: 1.5px solid rgba(34, 211, 238, 0.4);
+            pointer-events: none;
+            animation: ai-orb-ring 3.6s ease-in-out infinite;
+        }
+
+        .ai-orb::after {
+            inset: -20px;
+            border-color: rgba(52, 211, 153, 0.28);
+            animation-delay: -1.8s;
+        }
+
+        @keyframes ai-orb-pulse {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow:
+                    0 0 0 0 rgba(34, 211, 238, 0.2),
+                    0 0 18px 4px rgba(6, 182, 212, 0.38),
+                    0 0 36px 10px rgba(16, 185, 129, 0.18);
+            }
+            50% {
+                transform: scale(1.07);
+                box-shadow:
+                    0 0 0 8px rgba(34, 211, 238, 0.08),
+                    0 0 32px 10px rgba(6, 182, 212, 0.62),
+                    0 0 64px 20px rgba(16, 185, 129, 0.32);
+            }
+        }
+
+        @keyframes ai-orb-ring {
+            0%, 100% { opacity: 0.2; transform: scale(0.94); }
+            50% { opacity: 0.75; transform: scale(1.05); }
+        }
+
+        .ai-dock.open .ai-orb {
+            animation: none;
+            transform: scale(1);
+            background: radial-gradient(circle at 32% 28%, #e2e8f0 0%, #64748b 70%, #334155 100%);
+            box-shadow: 0 8px 20px -8px rgba(15, 23, 42, 0.45);
+        }
+
+        .ai-dock.open .ai-orb::before,
+        .ai-dock.open .ai-orb::after {
+            animation: none;
+            opacity: 0;
+        }
+
+        .ai-orb .ai-orb-close { display: none; }
+        .ai-dock.open .ai-orb .ai-orb-open { display: none; }
+        .ai-dock.open .ai-orb .ai-orb-close { display: block; }
+
+        .ai-panel {
+            width: min(24.5rem, calc(100vw - 1.5rem));
+            height: min(34rem, calc(100vh - 8rem));
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transform: translateY(18px) scale(0.94);
+            transform-origin: bottom right;
+            transition: opacity 0.28s ease, transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.28s ease;
+            border-top: 2px solid #06b6d4;
+            box-shadow: 0 24px 50px -18px rgba(6, 182, 212, 0.35), 0 10px 30px -12px rgba(15, 23, 42, 0.2);
+        }
+
+        .ai-dock.open .ai-panel {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+            transform: none;
+        }
+
+        @media (max-width: 480px) {
+            .ai-dock { right: 0.75rem; bottom: 0.75rem; }
+            .ai-orb { width: 3.75rem; height: 3.75rem; }
+            .ai-panel { height: min(32rem, calc(100vh - 7rem)); }
+        }
+
+        .hypo-backdrop {
+            position: fixed;
+            inset: 0;
+            z-index: 74;
+            background: rgba(15, 23, 42, 0.28);
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transition: opacity 0.22s ease, visibility 0.22s ease;
+        }
+        body.hypo-open .hypo-backdrop {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+        }
+        .hypo-modal {
+            position: fixed;
+            z-index: 76;
+            left: 50%;
+            top: 50%;
+            width: min(32rem, calc(100vw - 1.5rem));
+            max-height: calc(100vh - 3rem);
+            overflow: auto;
+            transform: translate(-50%, -48%) scale(0.96);
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transition: opacity 0.22s ease, transform 0.22s ease, visibility 0.22s ease;
+        }
+        body.hypo-open .hypo-modal {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+            transform: translate(-50%, -50%) scale(1);
+        }
     </style>
 </head>
 <body class="bg-brand-bg dark:bg-brand-bg-dark text-slate-800 dark:text-slate-100 min-h-screen p-4 sm:p-6 lg:p-8 flex flex-col items-center selection:bg-cyan-500 selection:text-white">
 
-    <!-- Динамический светящийся фон для ощущения воздуха и объемного света -->
+    <div class="hidden">
+        <span class="border-emerald-200/80 dark:border-emerald-500/30 bg-emerald-50/40 dark:bg-emerald-900/10 bg-emerald-500 shadow-emerald-500/30 stroke-emerald-500 fill-emerald-500/10"></span>
+        <span class="border-rose-200/80 dark:border-rose-500/30 bg-rose-50/40 dark:bg-rose-900/10 bg-rose-500 shadow-rose-500/30 stroke-rose-500 fill-rose-500/10"></span>
+        <span class="border-cyan-200/80 dark:border-cyan-500/30 bg-cyan-50/40 dark:bg-cyan-900/10 bg-cyan-500 shadow-cyan-500/30 stroke-cyan-500 fill-cyan-500/10"></span>
+        <span class="border-amber-300/90 dark:border-amber-500/40 bg-amber-50/50 dark:bg-amber-900/15 bg-amber-500 shadow-amber-500/30 stroke-amber-500 fill-amber-500/10"></span>
+    </div>
     <div class="aurora-bg">
         <div class="aurora-blob bg-cyan-200 dark:bg-cyan-900/40 w-[500px] h-[500px] -top-32 -left-32"></div>
         <div class="aurora-blob bg-emerald-200 dark:bg-emerald-900/30 w-[600px] h-[600px] top-1/3 -right-40" style="animation-delay: -6s;"></div>
@@ -214,6 +406,16 @@
             </div>
             
             <div class="flex items-center gap-3 sm:gap-4 text-xs sm:text-sm font-semibold">
+                <div id="lab-user" class="hidden items-center gap-2 px-3 py-1.5 rounded-full bg-slate-50 dark:bg-slate-800/70 border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300">
+                    <span id="lab-energy" class="text-amber-600 dark:text-amber-400 font-bold whitespace-nowrap">⚡ —</span>
+                    <span class="text-slate-300 dark:text-slate-600">|</span>
+                    <button type="button" id="lab-nick" title="Сменить имя" class="whitespace-nowrap hover:text-cyan-600 dark:hover:text-cyan-400">…</button>
+                    <span class="text-slate-300 dark:text-slate-600">|</span>
+                    <span id="lab-key" class="font-mono text-[11px] text-slate-500 dark:text-slate-400">ключ…</span>
+                    <button type="button" id="lab-copy" title="Скопировать ключ" class="text-cyan-600 dark:text-cyan-400 hover:underline">Копировать</button>
+                    <button type="button" id="lab-restore-btn" title="Вставить другой ключ" class="text-slate-400 hover:text-cyan-600 dark:hover:text-cyan-400">Ключ</button>
+                </div>
+
                 <!-- Статус активности -->
                 <div class="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-500/30 text-emerald-700 dark:text-emerald-400">
                     <span class="relative flex h-2 w-2">
@@ -233,7 +435,7 @@
 
         <!-- TOP METRICS (Hero Bar) -->
         <section class="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6">
-            <!-- Совокупный R-профит -->
+            <!-- Сумма в R -->
             <div class="glass-panel p-5 flex flex-col justify-between relative group h-full gap-4 hover:z-50 transition-all duration-300">
                 <!-- Изолированный слой для фонового свечения, чтобы не обрезать Tooltip -->
                 <div class="absolute inset-0 overflow-hidden rounded-[1.25rem] pointer-events-none">
@@ -241,7 +443,7 @@
                 </div>
                 
                 <div class="flex flex-wrap sm:flex-nowrap justify-between items-start w-full z-10 gap-3 sm:gap-2">
-                    <span class="text-xs font-bold text-slate-400 dark:text-slate-400 uppercase tracking-wider min-w-[120px]">Суммарный профит</span>
+                    <span class="text-xs font-bold text-slate-400 dark:text-slate-400 uppercase tracking-wider min-w-[120px]">Сумма в R</span>
                     <!-- Переключатель периодов -->
                     <div class="flex bg-slate-200/50 dark:bg-slate-800/50 rounded-lg p-0.5 border border-slate-300/40 dark:border-white/5 text-[10px] font-semibold flex-shrink-0 w-full sm:w-auto">
                         <button onclick="setPeriod(this, 'all')" class="px-2 py-1 rounded-md bg-white dark:bg-slate-700 text-slate-800 dark:text-white shadow-sm transition-all period-btn active-period flex-1 sm:flex-none">Всё время</button>
@@ -257,7 +459,7 @@
                             
                             <!-- Всплывающая подсказка (Tooltip) -->
                             <div class="absolute top-full left-0 mt-3 w-[calc(100vw-3rem)] max-w-[280px] sm:max-w-[320px] p-3.5 bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl border border-slate-200 dark:border-white/10 rounded-xl shadow-2xl opacity-0 invisible group-hover/tooltip:opacity-100 group-hover/tooltip:visible transition-all duration-200 text-[11px] sm:text-xs leading-relaxed text-slate-600 dark:text-slate-300 pointer-events-none translate-y-2 group-hover/tooltip:translate-y-0 z-[100]">
-                                Показатель отражает чистый результат работы алгоритмов: сумму всех прибыльных отработок за вычетом тех сценариев, которые ушли в минус. Мы считаем результат в R, а не в деньгах, чтобы объективно показать математику стратегий независимо от размера вашего депозита.
+                                Итог прогона: плюс и минус всех досчитанных вероятностей в R. Не деньги и не совет.
                             </div>
                         </div>
                         <span id="hero-profit-caption" class="text-[11px] font-medium text-emerald-700/70 dark:text-emerald-400/70 mt-1.5 flex items-center gap-1 whitespace-nowrap">
@@ -275,14 +477,14 @@
                 </div>
             </div>
 
-            <!-- Индекс реализации -->
+            <!-- Как часто до цели -->
             <div class="glass-panel p-5 flex flex-col justify-between relative group h-full gap-4 hover:z-50 transition-all duration-300">
                 <div class="absolute inset-0 overflow-hidden rounded-[1.25rem] pointer-events-none">
                     <div class="absolute -right-6 -top-6 w-24 h-24 bg-cyan-400/10 rounded-full blur-xl group-hover:scale-150 transition-transform"></div>
                 </div>
                 
                 <div class="flex justify-between items-start w-full z-10">
-                    <span class="text-xs font-bold text-slate-400 dark:text-slate-400 uppercase tracking-wider">Индекс реализации</span>
+                    <span class="text-xs font-bold text-slate-400 dark:text-slate-400 tracking-wide leading-snug">Как часто до цели</span>
                     <div class="w-7 h-7 rounded-lg bg-cyan-50 dark:bg-cyan-900/30 text-cyan-500 dark:text-cyan-400 flex items-center justify-center flex-shrink-0 shadow-sm border border-cyan-100 dark:border-cyan-500/20">
                         <i class="ph-bold ph-target"></i>
                     </div>
@@ -291,9 +493,6 @@
                 <div class="flex items-end justify-between w-full z-10">
                     <div class="flex flex-col relative">
                         <span id="hero-wr-val" class="text-2xl sm:text-3xl font-extrabold text-slate-800 dark:text-white tracking-tight whitespace-nowrap">—%</span>
-                        <span id="hero-wr-label" class="text-[11px] font-medium text-slate-500 dark:text-slate-400 mt-1.5 flex items-center gap-1 whitespace-nowrap">
-                            Доля сетапов до цели
-                        </span>
                     </div>
                     <!-- Mini Gauge -->
                     <div class="w-10 h-10 ml-2 relative opacity-90 flex-shrink-0 drop-shadow-sm">
@@ -359,77 +558,114 @@
                         </div>
                         <h2 class="text-lg font-bold text-slate-900 dark:text-white">Погода рынка</h2>
                     </div>
-                    <span class="text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400">
-                        Обновлено 2м назад
+                    <span id="wx-updated" class="text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400">
+                        Закрытые часовики H1
                     </span>
                 </div>
                 
                 <div class="flex flex-col gap-4">
-                    <!-- Карточка Золота (XAU/USD) -->
-                <div class="glass-panel p-4 border border-emerald-200/80 dark:border-emerald-500/30 bg-emerald-50/40 dark:bg-emerald-900/10 rounded-2xl relative overflow-hidden group transition-all">
-                    <div class="flex justify-between items-start mb-3">
-                        <div>
-                            <span class="text-xs font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider">XAU / USD</span>
-                            <h3 class="font-bold text-base text-slate-900 dark:text-white">Золото</h3>
+                    <article id="wx-xau-card" class="glass-panel p-4 border border-slate-200/80 dark:border-white/10 rounded-2xl relative overflow-hidden">
+                        <div class="flex justify-between items-start mb-3 gap-2">
+                            <div>
+                                <span class="text-xs font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider">XAU / USD</span>
+                                <h3 class="font-bold text-base text-slate-900 dark:text-white">Золото</h3>
+                            </div>
+                            <span id="wx-xau-badge" class="inline-flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-lg bg-slate-500 text-white shadow-sm">
+                                <i class="ph-bold ph-circle"></i>
+                                <span id="wx-xau-badge-text">Загрузка</span>
+                            </span>
                         </div>
-                        <span class="inline-flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-lg bg-emerald-500 text-white shadow-sm shadow-emerald-500/30">
-                            <i class="ph-bold ph-lightning"></i> Бычий шторм
-                        </span>
-                    </div>
-                    <div class="flex items-center gap-4">
-                        <!-- Gauge Indicator (Радар погоды) -->
-                        <div class="relative w-14 h-14 flex-shrink-0">
-                            <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
-                                <circle cx="18" cy="18" r="15.915" fill="transparent" stroke="currentColor" stroke-width="3" class="text-emerald-200 dark:text-emerald-900/50"></circle>
-                                <circle cx="18" cy="18" r="15.915" fill="transparent" stroke="currentColor" stroke-width="3" stroke-dasharray="92, 100" stroke-linecap="round" class="text-emerald-500 gauge-circle"></circle>
-                            </svg>
-                            <div class="absolute inset-0 flex flex-col items-center justify-center">
-                                <span class="text-[10px] font-bold text-emerald-700 dark:text-emerald-400 leading-none">92%</span>
+                        <div class="flex items-end justify-between gap-3 mb-2">
+                            <div>
+                                <div id="wx-xau-price" class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">—</div>
+                                <div id="wx-xau-price-note" class="text-[10px] font-medium text-slate-400 mt-0.5">Текущая цена</div>
+                            </div>
+                            <div class="w-24 h-10 flex-shrink-0 opacity-90">
+                                <svg id="wx-xau-svg" viewBox="0 0 100 30" class="w-full h-full stroke-amber-500 fill-none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path id="wx-xau-line" d="M5,15 L95,15" />
+                                    <path id="wx-xau-area" d="M5,15 L95,15 L95,30 L5,30 Z" class="fill-amber-500/10 stroke-none" />
+                                    <circle id="wx-xau-mark-high" cx="50" cy="8" r="2.4" class="fill-amber-500 stroke-none hidden"></circle>
+                                    <circle id="wx-xau-mark-low" cx="50" cy="22" r="2.4" class="fill-cyan-500 stroke-none hidden"></circle>
+                                </svg>
                             </div>
                         </div>
-                        <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 font-medium leading-relaxed">
-                            Мощный восходящий импульс. В приоритете трендовые модели на покупку на локальных откатах.
-                        </p>
-                    </div>
-                </div>
-
-                <!-- Карточка Серебра (XAG/USD) -->
-                <div class="glass-panel p-4 border border-cyan-200/80 dark:border-cyan-500/30 bg-cyan-50/40 dark:bg-cyan-900/10 rounded-2xl relative overflow-hidden group transition-all">
-                    <div class="flex justify-between items-start mb-3">
-                        <div>
-                            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">XAG / USD</span>
-                            <h3 class="font-bold text-base text-slate-900 dark:text-white">Серебро</h3>
+                        <p id="wx-xau-summary" class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 font-medium leading-relaxed mb-2">Считаем структуру по H1…</p>
+                        <div class="flex items-center gap-2 mb-3">
+                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider shrink-0">ADX</span>
+                            <div class="flex-1 h-1.5 rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden">
+                                <div id="wx-xau-adx-bar" class="h-full rounded-full bg-amber-500" style="width: 0%"></div>
+                            </div>
+                            <span id="wx-xau-adx" class="text-[11px] font-bold text-slate-700 dark:text-slate-200 whitespace-nowrap">—</span>
                         </div>
-                        <span class="inline-flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-lg bg-cyan-500 text-white shadow-sm shadow-cyan-500/30">
-                            <i class="ph-bold ph-waves"></i> Штиль
-                        </span>
-                    </div>
-                    <div class="flex items-center gap-4">
-                        <!-- Gauge Indicator (Радар погоды) -->
-                        <div class="relative w-14 h-14 flex-shrink-0">
-                            <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
-                                <circle cx="18" cy="18" r="15.915" fill="transparent" stroke="currentColor" stroke-width="3" class="text-cyan-200 dark:text-cyan-900/50"></circle>
-                                <circle cx="18" cy="18" r="15.915" fill="transparent" stroke="currentColor" stroke-width="3" stroke-dasharray="15, 100" stroke-linecap="round" class="text-cyan-500 gauge-circle"></circle>
-                            </svg>
-                            <div class="absolute inset-0 flex flex-col items-center justify-center">
-                                <span class="text-[10px] font-bold text-cyan-700 dark:text-cyan-400 leading-none">15%</span>
+                        <p class="text-[9px] text-slate-400 mb-3 leading-tight">ADX: до 20 слабый · 20–35 средний · 35–50 сильный · от 50 шторм</p>
+                        <div class="grid grid-cols-2 gap-2 text-[11px]">
+                            <div class="rounded-lg bg-white/70 dark:bg-slate-800/50 border border-slate-100 dark:border-white/5 px-2.5 py-2">
+                                <div class="font-bold text-slate-400 uppercase tracking-wider mb-0.5">Последний max</div>
+                                <div id="wx-xau-high" class="font-semibold text-slate-800 dark:text-slate-100">—</div>
+                            </div>
+                            <div class="rounded-lg bg-white/70 dark:bg-slate-800/50 border border-slate-100 dark:border-white/5 px-2.5 py-2">
+                                <div class="font-bold text-slate-400 uppercase tracking-wider mb-0.5">Последний min</div>
+                                <div id="wx-xau-low" class="font-semibold text-slate-800 dark:text-slate-100">—</div>
                             </div>
                         </div>
-                        <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 font-medium leading-relaxed">
-                            Узкий боковой диапазон. Активированы алгоритмы работы от границ коридора (Mean Reversion).
-                        </p>
-                    </div>
-                </div>
-            </div>
+                        <p id="wx-xau-pos" class="text-[11px] font-medium text-slate-500 dark:text-slate-400 mt-2">Оценка по закрытым часовикам</p>
+                    </article>
 
-            <!-- Глобальный фокус -->
-                <div class="mt-auto pt-4 bg-emerald-50 dark:bg-emerald-950/30 rounded-xl p-3.5 border border-emerald-200/80 dark:border-emerald-500/20 flex items-start gap-3">
-                    <div class="p-2 rounded-lg bg-emerald-500 text-white flex-shrink-0 mt-0.5 shadow-sm">
-                        <i class="ph-bold ph-target text-base"></i>
+                    <article id="wx-xag-card" class="glass-panel p-4 border border-slate-200/80 dark:border-white/10 rounded-2xl relative overflow-hidden">
+                        <div class="flex justify-between items-start mb-3 gap-2">
+                            <div>
+                                <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">XAG / USD</span>
+                                <h3 class="font-bold text-base text-slate-900 dark:text-white">Серебро</h3>
+                            </div>
+                            <span id="wx-xag-badge" class="inline-flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-lg bg-slate-500 text-white shadow-sm">
+                                <i class="ph-bold ph-circle"></i>
+                                <span id="wx-xag-badge-text">Загрузка</span>
+                            </span>
+                        </div>
+                        <div class="flex items-end justify-between gap-3 mb-2">
+                            <div>
+                                <div id="wx-xag-price" class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">—</div>
+                                <div id="wx-xag-price-note" class="text-[10px] font-medium text-slate-400 mt-0.5">Текущая цена</div>
+                            </div>
+                            <div class="w-24 h-10 flex-shrink-0 opacity-90">
+                                <svg id="wx-xag-svg" viewBox="0 0 100 30" class="w-full h-full stroke-cyan-500 fill-none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path id="wx-xag-line" d="M5,15 L95,15" />
+                                    <path id="wx-xag-area" d="M5,15 L95,15 L95,30 L5,30 Z" class="fill-cyan-500/10 stroke-none" />
+                                    <circle id="wx-xag-mark-high" cx="50" cy="8" r="2.4" class="fill-amber-500 stroke-none hidden"></circle>
+                                    <circle id="wx-xag-mark-low" cx="50" cy="22" r="2.4" class="fill-cyan-500 stroke-none hidden"></circle>
+                                </svg>
+                            </div>
+                        </div>
+                        <p id="wx-xag-summary" class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 font-medium leading-relaxed mb-2">Считаем структуру по H1…</p>
+                        <div class="flex items-center gap-2 mb-3">
+                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider shrink-0">ADX</span>
+                            <div class="flex-1 h-1.5 rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden">
+                                <div id="wx-xag-adx-bar" class="h-full rounded-full bg-cyan-500" style="width: 0%"></div>
+                            </div>
+                            <span id="wx-xag-adx" class="text-[11px] font-bold text-slate-700 dark:text-slate-200 whitespace-nowrap">—</span>
+                        </div>
+                        <p class="text-[9px] text-slate-400 mb-3 leading-tight">ADX: до 20 слабый · 20–35 средний · 35–50 сильный · от 50 шторм</p>
+                        <div class="grid grid-cols-2 gap-2 text-[11px]">
+                            <div class="rounded-lg bg-white/70 dark:bg-slate-800/50 border border-slate-100 dark:border-white/5 px-2.5 py-2">
+                                <div class="font-bold text-slate-400 uppercase tracking-wider mb-0.5">Последний max</div>
+                                <div id="wx-xag-high" class="font-semibold text-slate-800 dark:text-slate-100">—</div>
+                            </div>
+                            <div class="rounded-lg bg-white/70 dark:bg-slate-800/50 border border-slate-100 dark:border-white/5 px-2.5 py-2">
+                                <div class="font-bold text-slate-400 uppercase tracking-wider mb-0.5">Последний min</div>
+                                <div id="wx-xag-low" class="font-semibold text-slate-800 dark:text-slate-100">—</div>
+                            </div>
+                        </div>
+                        <p id="wx-xag-pos" class="text-[11px] font-medium text-slate-500 dark:text-slate-400 mt-2">Оценка по закрытым часовикам</p>
+                    </article>
+                </div>
+
+                <div class="mt-auto pt-4 bg-slate-50 dark:bg-slate-900/40 rounded-xl p-3.5 border border-slate-200/80 dark:border-white/10 flex items-start gap-3">
+                    <div class="p-2 rounded-lg bg-slate-700 dark:bg-slate-600 text-white flex-shrink-0 mt-0.5 shadow-sm">
+                        <i class="ph-bold ph-clock text-base"></i>
                     </div>
                     <div>
-                        <span class="block text-xs font-bold text-emerald-800 dark:text-emerald-400 uppercase tracking-wider mb-0.5">Глобальный фокус дня</span>
-                        <span class="text-xs font-semibold text-slate-700 dark:text-slate-200">Лонг-сетапы на откате (Pullback) в мажоритарных драгметаллах.</span>
+                        <span class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-0.5">Сводка по часовикам</span>
+                        <span id="wx-focus" class="text-xs font-semibold text-slate-700 dark:text-slate-200">Ждём снимок H1…</span>
                     </div>
                 </div>
             </div>
@@ -443,253 +679,33 @@
                         </div>
                         <h2 class="text-lg font-bold text-slate-900 dark:text-white">Арена ботов</h2>
                     </div>
-                    <span class="text-xs font-semibold text-slate-400 dark:text-slate-400">Top Performers</span>
+                    <span id="arena-hint" class="text-xs font-semibold text-slate-400 dark:text-slate-400">Пять демо-систем · в R</span>
                 </div>
                 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <!-- Бот 1 (Активный - Подсвечен) -->
-                <div class="glass-panel p-4 text-slate-800 dark:text-white glow-active relative flex flex-col gap-3 glass-panel-hover bg-white/90 dark:bg-slate-800/90 bot-card" onclick="toggleBotDetails('bot1')">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <h3 class="font-bold text-base text-slate-900 dark:text-white flex items-center gap-1.5">
-                                Бот #1 
-                            </h3>
-                            <span class="text-xs font-medium text-slate-500 dark:text-slate-400">Impulse Pullback</span>
-                        </div>
-                        <span class="text-[11px] font-extrabold px-2.5 py-0.5 rounded-full bg-emerald-500 text-white shadow-sm">
-                            Live
-                        </span>
-                    </div>
-                    <div class="flex justify-between items-end">
-                        <div class="text-3xl font-extrabold text-emerald-600 dark:text-emerald-400 tracking-tight">+42.0 R</div>
-                        <!-- Mini Sparkline (Микро-график) -->
-                        <div class="w-16 h-8 opacity-80 mb-1">
-                            <svg viewBox="0 0 100 30" class="w-full h-full stroke-emerald-500 fill-none" stroke-width="3" stroke-linecap="round">
-                                <path d="M0,25 L20,20 L40,25 L60,10 L80,15 L100,5" />
-                            </svg>
-                        </div>
-                    </div>
-                    <div class="text-xs font-medium text-emerald-700 dark:text-emerald-400 flex items-center justify-between pt-2 border-t border-slate-100 dark:border-white/5">
-                        <span class="flex items-center gap-1.5"><i class="ph-bold ph-check-circle text-base"></i> Идеально совпадает с «Штормом»</span>
-                        <i class="ph-bold ph-caret-down text-emerald-500 transition-transform" id="bot1-icon"></i>
-                    </div>
-                    
-                    <!-- Drill-down Details (Скрытая панель) -->
-                    <div id="bot1-details" class="bot-details">
-                        <div class="bot-details-inner flex flex-col gap-2 pt-3">
-                            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Последние сделки</div>
-                            <div class="flex justify-between items-center bg-slate-50 dark:bg-slate-800/50 p-2 rounded-lg border border-slate-100 dark:border-white/5">
-                                <div class="flex items-center gap-2">
-                                    <div class="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>
-                                    <span class="text-xs font-medium text-slate-700 dark:text-slate-300">XAU/USD Long</span>
-                                </div>
-                                <span class="text-xs font-bold text-emerald-600 dark:text-emerald-400">+3.5 R</span>
-                            </div>
-                            <div class="flex justify-between items-center bg-slate-50 dark:bg-slate-800/50 p-2 rounded-lg border border-slate-100 dark:border-white/5">
-                                <div class="flex items-center gap-2">
-                                    <div class="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>
-                                    <span class="text-xs font-medium text-slate-700 dark:text-slate-300">XAU/USD Long</span>
-                                </div>
-                                <span class="text-xs font-bold text-emerald-600 dark:text-emerald-400">+4.2 R</span>
-                            </div>
-                            <div class="mt-1 bg-amber-50 dark:bg-amber-900/20 p-2 rounded-lg border border-amber-200/50 dark:border-amber-500/20 flex justify-between items-center">
-                                <span class="text-[11px] font-semibold text-amber-700 dark:text-amber-400 flex items-center gap-1.5"><i class="ph-bold ph-target"></i> Открыт ордер (Trailing)</span>
-                                <span class="text-xs font-bold text-amber-600 dark:text-amber-400">+1.2 R</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Бот 2 (Ожидание) -->
-                <div class="glass-panel p-4 text-slate-800 dark:text-white flex flex-col gap-3 glass-panel-hover bot-card" onclick="toggleBotDetails('bot2')">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <h3 class="font-bold text-base text-slate-900 dark:text-white">Бот #2</h3>
-                            <span class="text-xs font-medium text-slate-500 dark:text-slate-400">RSI Divergence</span>
-                        </div>
-                        <span class="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-400 border border-amber-300/60 dark:border-amber-500/30">
-                            Ожидание
-                        </span>
-                    </div>
-                    <div class="flex justify-between items-end">
-                        <div class="text-3xl font-extrabold text-slate-800 dark:text-white tracking-tight">+18.5 R</div>
-                        <!-- Mini Sparkline Flat -->
-                        <div class="w-16 h-8 opacity-40 mb-1">
-                            <svg viewBox="0 0 100 30" class="w-full h-full stroke-slate-500 fill-none" stroke-width="2" stroke-linecap="round">
-                                <path d="M0,15 L100,15" stroke-dasharray="4,4" />
-                            </svg>
-                        </div>
-                    </div>
-                    <div class="text-xs font-medium text-amber-700 dark:text-amber-400 flex items-center justify-between pt-2 border-t border-slate-100 dark:border-white/5">
-                        <span class="flex items-center gap-1.5"><i class="ph-bold ph-hourglass-high text-base"></i> Ждет смены фазы</span>
-                        <i class="ph-bold ph-caret-down text-slate-400 transition-transform" id="bot2-icon"></i>
-                    </div>
-                    <!-- Drill-down Details -->
-                    <div id="bot2-details" class="bot-details">
-                        <div class="bot-details-inner flex flex-col gap-2 pt-3">
-                            <div class="text-[11px] text-center text-slate-500 dark:text-slate-400 italic">Нет активных позиций. Последняя сделка закрыта 4ч назад.</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Бот 3 (Активен) -->
-                <div class="glass-panel p-4 text-slate-800 dark:text-white flex flex-col gap-3 glass-panel-hover bot-card" onclick="toggleBotDetails('bot3')">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <h3 class="font-bold text-base text-slate-900 dark:text-white">Бот #3</h3>
-                            <span class="text-xs font-medium text-slate-500 dark:text-slate-400">Structure Break</span>
-                        </div>
-                        <span class="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-cyan-100 dark:bg-cyan-900/40 text-cyan-700 dark:text-cyan-300 border border-cyan-300/60 dark:border-cyan-500/30">
-                            Активен
-                        </span>
-                    </div>
-                    <div class="flex justify-between items-end">
-                        <div class="text-3xl font-extrabold text-emerald-600 dark:text-emerald-400 tracking-tight">+31.2 R</div>
-                        <!-- Mini Sparkline -->
-                        <div class="w-16 h-8 opacity-80 mb-1">
-                            <svg viewBox="0 0 100 30" class="w-full h-full stroke-cyan-500 fill-none" stroke-width="3" stroke-linecap="round">
-                                <path d="M0,20 L30,22 L50,15 L70,18 L100,5" />
-                            </svg>
-                        </div>
-                    </div>
-                    <div class="text-xs font-medium text-slate-500 dark:text-slate-400 flex items-center justify-between pt-2 border-t border-slate-100 dark:border-white/5">
-                        <span class="flex items-center gap-1.5"><i class="ph-bold ph-activity text-base text-cyan-500"></i> Сканирует пробой M15</span>
-                        <i class="ph-bold ph-caret-down text-slate-400 transition-transform" id="bot3-icon"></i>
-                    </div>
-                    <!-- Drill-down Details -->
-                    <div id="bot3-details" class="bot-details">
-                        <div class="bot-details-inner flex flex-col gap-2 pt-3">
-                            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Сенсоры (Live)</div>
-                            <div class="flex justify-between items-center bg-slate-50 dark:bg-slate-800/50 p-2 rounded-lg border border-slate-100 dark:border-white/5">
-                                <span class="text-xs font-medium text-slate-700 dark:text-slate-300">Уровень сопротивления</span>
-                                <span class="text-xs font-bold text-slate-900 dark:text-white">2,345.10</span>
-                            </div>
-                            <div class="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-1 mt-1">
-                                <div class="bg-cyan-500 h-1 rounded-full animate-pulse" style="width: 85%"></div>
-                            </div>
-                            <div class="text-[10px] text-right text-slate-500">Приближение к зоне: 85%</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Бот 4 (Спящий режим) -->
-                <div class="glass-panel p-4 opacity-60 dark:opacity-50 flex flex-col gap-3 hover:opacity-100 transition-opacity">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <h3 class="font-bold text-base text-slate-700 dark:text-slate-300">Бот #4</h3>
-                            <span class="text-xs font-medium text-slate-400">Mean Reversion</span>
-                        </div>
-                        <span class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-400">
-                            Standby
-                        </span>
-                    </div>
-                    <div class="text-3xl font-extrabold text-slate-500 dark:text-slate-400 tracking-tight">+12.4 R</div>
-                    <div class="text-xs font-medium text-slate-400 flex items-center gap-1.5 pt-2 border-t border-slate-100 dark:border-white/5">
-                        <i class="ph-bold ph-moon-stars text-base"></i> Отключен во время «Шторма»
-                    </div>
+                <div id="arena-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="sm:col-span-2 text-sm text-slate-500 dark:text-slate-400 py-8 text-center">Ждём сводку по ботам…</div>
                 </div>
             </div>
-        </div>
-    </section>
-
-    <!-- МОДУЛЬ 4. ВСТРОЕННЫЙ ИИ-ПОМОЩНИК (AI Strategy Assistant) -->
-        <section class="glass-panel flex flex-col overflow-hidden border-t-2 border-t-cyan-500">
-            <!-- Шапка чата -->
-            <div class="bg-cyan-500/5 dark:bg-cyan-900/20 px-6 py-4 flex items-center justify-between border-b border-slate-200/80 dark:border-white/5">
-                <div class="flex items-center gap-3.5">
-                    <div class="w-10 h-10 rounded-xl bg-cyan-500/15 text-cyan-600 dark:text-cyan-400 flex items-center justify-center relative shadow-sm">
-                        <i class="ph-bold ph-sparkle text-xl"></i>
-                        <span class="absolute top-0 right-0 w-3 h-3 bg-emerald-500 rounded-full border-2 border-white dark:border-slate-900"></span>
-                    </div>
-                    <div>
-                        <h3 class="font-bold text-slate-900 dark:text-white text-base">AI Strategy Assistant</h3>
-                        <p class="text-xs font-medium text-slate-500 dark:text-cyan-400/80">Пояснит погоду рынка и логику работы алгоритмов в реальном времени</p>
-                    </div>
-                </div>
-                <span class="text-xs font-bold px-2.5 py-1 rounded-md bg-cyan-100 dark:bg-cyan-950 text-cyan-700 dark:text-cyan-300 hidden sm:inline-block">
-                    Gemini 3.1 Powered
-                </span>
-            </div>
-
-            <!-- Диалоговое окно сообщений -->
-        <div id="chat-messages" class="relative p-6 flex flex-col gap-4 h-72 overflow-y-auto custom-scrollbar bg-slate-50/50 dark:bg-slate-950/20">
-            
-            <!-- Proactive AI Toast (Push-инсайт) -->
-            <div id="proactive-toast" class="hidden absolute top-4 left-6 right-6 z-10 ai-toast">
-                <div class="bg-white/95 dark:bg-slate-800/95 border border-cyan-200/80 dark:border-cyan-500/30 rounded-xl p-3 shadow-lg shadow-cyan-500/10 flex items-start gap-3 backdrop-blur-md">
-                    <div class="w-6 h-6 rounded-full bg-cyan-500 text-white flex-shrink-0 flex items-center justify-center mt-0.5 shadow-sm shadow-cyan-500/30">
-                        <i class="ph-bold ph-bell-ringing text-xs"></i>
-                    </div>
-                    <div class="flex-1">
-                        <span class="text-[10px] font-bold text-cyan-600 dark:text-cyan-400 uppercase tracking-wider mb-0.5 block">Live-Инсайт (Событие)</span>
-                        <p class="text-[13px] font-medium text-slate-700 dark:text-slate-200 leading-tight">
-                            Сенсоры фиксируют падение волатильности на XAG/USD. Алгоритм Бота #4 переведен в режим сканирования границ.
-                        </p>
-                    </div>
-                    <button onclick="document.getElementById('proactive-toast').style.display='none'" class="ml-1 text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300">
-                        <i class="ph-bold ph-x text-sm"></i>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Сообщение от ИИ -->
-            <div class="flex gap-3 max-w-[85%] mt-2">
-                </button>
-            </div>
-        </div>
-
-        <!-- Поле ввода вопроса с быстрыми подсказками -->
-        <div class="p-4 bg-white/80 dark:bg-slate-900/80 border-t border-slate-200/80 dark:border-white/10 flex flex-col gap-3">
-            
-            <!-- Чипы быстрых вопросов -->
-            <div class="flex flex-wrap gap-2">
-                <button onclick="sendPrompt('Что с золотом?')" class="px-3 py-1.5 rounded-full bg-cyan-50/80 hover:bg-cyan-100 dark:bg-cyan-900/30 dark:hover:bg-cyan-800/50 border border-cyan-200/60 dark:border-cyan-700/30 text-[11px] sm:text-xs font-semibold text-cyan-700 dark:text-cyan-300 transition-all shadow-sm hover:shadow hover:-translate-y-0.5 whitespace-nowrap">
-                    Что с золотом?
-                </button>
-                <button onclick="sendPrompt('Почему сработал бот 1?')" class="px-3 py-1.5 rounded-full bg-cyan-50/80 hover:bg-cyan-100 dark:bg-cyan-900/30 dark:hover:bg-cyan-800/50 border border-cyan-200/60 dark:border-cyan-700/30 text-[11px] sm:text-xs font-semibold text-cyan-700 dark:text-cyan-300 transition-all shadow-sm hover:shadow hover:-translate-y-0.5 whitespace-nowrap">
-                    Почему сработал Бот #1?
-                </button>
-                <button onclick="sendPrompt('Объясни последний сбой')" class="px-3 py-1.5 rounded-full bg-cyan-50/80 hover:bg-cyan-100 dark:bg-cyan-900/30 dark:hover:bg-cyan-800/50 border border-cyan-200/60 dark:border-cyan-700/30 text-[11px] sm:text-xs font-semibold text-cyan-700 dark:text-cyan-300 transition-all shadow-sm hover:shadow hover:-translate-y-0.5 whitespace-nowrap">
-                    Объясни последний сбой
-                </button>
-            </div>
-
-            <div class="relative flex items-center">
-                <input type="text" id="chat-input" placeholder="Спросите ассистента о погоде или ботах..." 
-                       class="w-full bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-white/10 rounded-xl py-3 pl-4 pr-12 text-xs sm:text-sm font-medium text-slate-800 dark:text-white placeholder-slate-400 focus:outline-none focus:border-cyan-500 transition-colors"
-                       onkeypress="handleKeyPress(event)">
-                <button onclick="handleSend()" class="absolute right-2 p-2 rounded-lg bg-cyan-500 hover:bg-cyan-600 text-white flex items-center justify-center transition-colors shadow-md shadow-cyan-500/20">
-                    <i class="ph-bold ph-paper-plane-right text-base"></i>
-                </button>
-            </div>
-        </div>
-    </section>
+        </section>
 
     <!-- FOOTER: ИНКУБАТОР ГИПОТЕЗ -->
-    <footer class="mt-2 mb-8 flex flex-col items-center gap-5 text-center w-full">
+    <footer class="mt-2 mb-24 flex flex-col items-center gap-5 text-center w-full">
         
         <!-- Геймификация / Social Proof -->
         <div class="glass-panel px-6 py-4 rounded-2xl w-full max-w-md flex flex-col gap-2.5 relative overflow-hidden group">
-            <div class="absolute inset-0 bg-gradient-to-r from-emerald-500/0 via-emerald-500/10 to-emerald-500/0 translate-x-[-100%] animate-[shimmer_4s_infinite]"></div>
-            
             <div class="flex justify-between items-center text-xs font-bold z-10">
-                <span class="text-slate-600 dark:text-slate-300">Проверено гипотез за сегодня: <span class="text-emerald-600 dark:text-emerald-400">12</span></span>
-                <span class="text-amber-500 flex items-center gap-1 bg-amber-50 dark:bg-amber-900/20 px-2 py-0.5 rounded-md border border-amber-200 dark:border-amber-500/20"><i class="ph-fill ph-fire"></i> Hot</span>
+                <span class="text-slate-600 dark:text-slate-300">Проверено гипотез за сегодня: <span id="pulse-today" class="text-emerald-600 dark:text-emerald-400">—</span></span>
+                <span id="pulse-all" class="text-slate-400 font-semibold">всего —</span>
             </div>
-            
-            <!-- Progress bar -->
             <div class="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2 overflow-hidden z-10">
-                <div class="bg-gradient-to-r from-cyan-400 to-emerald-500 h-2 rounded-full relative" style="width: 78%">
-                    <div class="absolute inset-0 bg-white/20 animate-pulse"></div>
-                </div>
+                <div id="pulse-bar" class="bg-gradient-to-r from-cyan-400 to-emerald-500 h-2 rounded-full" style="width: 0%"></div>
             </div>
-            
-            <div class="text-[11px] text-slate-500 dark:text-slate-400 font-medium z-10 mt-0.5">
-                Пользователь <span class="font-bold text-slate-700 dark:text-slate-200">@Alex_Q</span> только что получил статус <span class="text-emerald-600 dark:text-emerald-400">Founding Member</span> 🎉
+            <div id="pulse-last" class="text-[11px] text-slate-500 dark:text-slate-400 font-medium z-10 mt-0.5">
+                Пока никто не проверял
             </div>
         </div>
 
-        <button class="group relative px-6 py-3.5 bg-white dark:bg-slate-800 border border-slate-200/90 dark:border-white/10 rounded-2xl flex items-center gap-2.5 hover:border-emerald-500 shadow-lg shadow-slate-200/50 dark:shadow-none transition-all overflow-hidden z-10">
+        <button type="button" onclick="setHypoOpen(true)" class="group relative px-6 py-3.5 bg-white dark:bg-slate-800 border border-slate-200/90 dark:border-white/10 rounded-2xl flex items-center gap-2.5 hover:border-emerald-500 shadow-lg shadow-slate-200/50 dark:shadow-none transition-all overflow-hidden z-10">
             <div class="absolute inset-0 bg-gradient-to-r from-emerald-500/0 via-emerald-500/10 to-emerald-500/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
             <div class="w-7 h-7 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-bold">
                 <i class="ph-bold ph-lightbulb text-lg"></i>
@@ -698,15 +714,307 @@
         </button>
         
         <div class="text-xs font-semibold text-slate-500 dark:text-slate-400 flex items-center justify-center gap-1.5 z-10">
-            <i class="ph-fill ph-medal text-amber-500 text-sm"></i>
-            <span>Бесплатный пожизненный доступ <strong class="text-slate-700 dark:text-slate-200">Founding Member</strong> для авторов валидных идей</span>
+            <span>Отчёт в R по закрытым свечам. Это лаборатория, не советы.</span>
         </div>
     </footer>
 
 </div>
 
+<div id="ai-backdrop" class="ai-backdrop" onclick="setAiDock(false)"></div>
+<div id="ai-dock" class="ai-dock">
+    <section id="ai-panel" class="ai-panel glass-panel" aria-hidden="true">
+        <div class="bg-cyan-500/5 dark:bg-cyan-900/20 px-4 py-3.5 flex items-center justify-between border-b border-slate-200/80 dark:border-white/5">
+            <div class="flex items-center gap-3 min-w-0">
+                <div class="w-9 h-9 rounded-xl bg-cyan-500/15 text-cyan-600 dark:text-cyan-400 flex items-center justify-center relative flex-shrink-0">
+                    <i class="ph-bold ph-sparkle text-lg"></i>
+                    <span class="absolute top-0 right-0 w-2.5 h-2.5 bg-emerald-500 rounded-full border-2 border-white dark:border-slate-900"></span>
+                </div>
+                <div class="min-w-0">
+                    <h3 class="font-bold text-slate-900 dark:text-white text-sm">Спросить лабораторию</h3>
+                    <p class="text-[11px] font-medium text-slate-500 dark:text-cyan-400/80 truncate">Пояснит карточки на странице. Не советы.</p>
+                </div>
+            </div>
+            <button type="button" onclick="setAiDock(false)" title="Закрыть диалог"
+                    class="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800">
+                <i class="ph-bold ph-x text-base"></i>
+            </button>
+        </div>
+
+        <div id="chat-messages" class="relative p-4 flex flex-col gap-3 flex-1 overflow-y-auto custom-scrollbar bg-slate-50/50 dark:bg-slate-950/20"></div>
+
+        <div class="p-3 bg-white/80 dark:bg-slate-900/80 border-t border-slate-200/80 dark:border-white/10 flex flex-col gap-2.5">
+            <div class="flex flex-wrap gap-1.5">
+                <button onclick="sendPrompt('Что с золотом?')" class="px-2.5 py-1 rounded-full bg-cyan-50/80 hover:bg-cyan-100 dark:bg-cyan-900/30 dark:hover:bg-cyan-800/50 border border-cyan-200/60 dark:border-cyan-700/30 text-[11px] font-semibold text-cyan-700 dark:text-cyan-300 transition-all whitespace-nowrap">
+                    Что с золотом?
+                </button>
+                <button onclick="sendPrompt('Кто лидирует на арене?')" class="px-2.5 py-1 rounded-full bg-cyan-50/80 hover:bg-cyan-100 dark:bg-cyan-900/30 dark:hover:bg-cyan-800/50 border border-cyan-200/60 dark:border-cyan-700/30 text-[11px] font-semibold text-cyan-700 dark:text-cyan-300 transition-all whitespace-nowrap">
+                    Кто лидирует на арене?
+                </button>
+                <button onclick="sendPrompt('Объясни последний сбой')" class="px-2.5 py-1 rounded-full bg-cyan-50/80 hover:bg-cyan-100 dark:bg-cyan-900/30 dark:hover:bg-cyan-800/50 border border-cyan-200/60 dark:border-cyan-700/30 text-[11px] font-semibold text-cyan-700 dark:text-cyan-300 transition-all whitespace-nowrap">
+                    Объясни последний сбой
+                </button>
+            </div>
+            <div class="relative flex items-center">
+                <input type="text" id="chat-input" placeholder="Спросите о погоде или ботах..."
+                       class="w-full bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-white/10 rounded-xl py-2.5 pl-3.5 pr-11 text-xs font-medium text-slate-800 dark:text-white placeholder-slate-400 focus:outline-none focus:border-cyan-500 transition-colors"
+                       onkeypress="handleKeyPress(event)">
+                <button onclick="handleSend()" class="absolute right-1.5 p-1.5 rounded-lg bg-cyan-500 hover:bg-cyan-600 text-white flex items-center justify-center transition-colors shadow-md shadow-cyan-500/20">
+                    <i class="ph-bold ph-paper-plane-right text-sm"></i>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <button type="button" id="ai-orb" class="ai-orb" onclick="toggleAiDock()" title="Спросить лабораторию" aria-expanded="false" aria-controls="ai-panel">
+        <span class="ai-orb-core">
+            <i class="ph-bold ph-sparkle ai-orb-open"></i>
+            <i class="ph-bold ph-x ai-orb-close"></i>
+        </span>
+    </button>
+</div>
+
+<div id="hypo-backdrop" class="hypo-backdrop" onclick="setHypoOpen(false)"></div>
+<section id="hypo-modal" class="hypo-modal glass-panel p-5 flex flex-col gap-4" aria-hidden="true">
+    <div class="flex items-start justify-between gap-3">
+        <div>
+            <h3 class="font-bold text-slate-900 dark:text-white text-base">Прогнать вероятность</h3>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Прогон по закрытым свечам за 90 дней. Списывается 5 энергии. Не совет.</p>
+        </div>
+        <button type="button" onclick="setHypoOpen(false)" class="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800">
+            <i class="ph-bold ph-x text-base"></i>
+        </button>
+    </div>
+    <form id="hypo-form" class="grid grid-cols-1 sm:grid-cols-2 gap-3" onsubmit="submitHypothesis(event)">
+        <label class="text-xs font-semibold text-slate-500 dark:text-slate-400 flex flex-col gap-1">Инструмент
+            <select name="symbol" class="rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900 px-3 py-2 text-sm text-slate-800 dark:text-white">
+                <option value="xau">Золото</option>
+                <option value="xag">Серебро</option>
+            </select>
+        </label>
+        <label class="text-xs font-semibold text-slate-500 dark:text-slate-400 flex flex-col gap-1">Правило
+            <select name="rule" class="rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900 px-3 py-2 text-sm text-slate-800 dark:text-white">
+                <option value="pinbar">Пинбар · хвост больше 60%</option>
+            </select>
+        </label>
+        <label class="text-xs font-semibold text-slate-500 dark:text-slate-400 flex flex-col gap-1">Цель
+            <select name="target_r" class="rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900 px-3 py-2 text-sm text-slate-800 dark:text-white">
+                <option value="1.5">1.5 R</option>
+                <option value="2" selected>2 R</option>
+                <option value="2.5">2.5 R</option>
+            </select>
+        </label>
+        <label class="text-xs font-semibold text-slate-500 dark:text-slate-400 flex flex-col gap-1">Окно времени
+            <select name="session" class="rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900 px-3 py-2 text-sm text-slate-800 dark:text-white">
+                <option value="all">Все часы</option>
+                <option value="day">Только день (Лондон–Нью-Йорк)</option>
+            </select>
+        </label>
+        <div class="sm:col-span-2 flex items-center justify-between gap-3 pt-1">
+            <span class="text-xs text-slate-500">Свеча 15 минут · глубина 90 дней</span>
+            <button type="submit" id="hypo-run" class="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-bold shadow-md shadow-emerald-500/20">Прогнать · −5⚡</button>
+        </div>
+    </form>
+    <div id="hypo-error" class="hidden text-sm text-rose-600 dark:text-rose-400"></div>
+    <div id="hypo-report" class="hidden rounded-2xl border border-slate-200/80 dark:border-white/10 bg-slate-50/70 dark:bg-slate-900/40 p-4 flex flex-col gap-2"></div>
+</section>
+
 <script>
         // Функция переключения светлой и темной темы
+        const LAB_KEY = 'yasno_access_key';
+        let labUser = null;
+
+        function applyLabUser(user) {
+            labUser = user;
+            const box = document.getElementById('lab-user');
+            if (!box || !user) return;
+            document.getElementById('lab-energy').innerText = '⚡ ' + user.energy + '/' + user.energy_max;
+            document.getElementById('lab-nick').innerText = user.nickname;
+            document.getElementById('lab-key').innerText = (user.user_key || '').slice(0, 12) + '…';
+            box.classList.remove('hidden');
+            box.classList.add('flex');
+        }
+
+        async function bootLabUser() {
+            const headers = {};
+            const saved = localStorage.getItem(LAB_KEY);
+            if (saved) headers.Authorization = 'Bearer ' + saved;
+            try {
+                let res;
+                if (saved) {
+                    res = await fetch('/api/me', { headers });
+                    if (!res.ok) {
+                        localStorage.removeItem(LAB_KEY);
+                        res = await fetch('/api/init-user', { method: 'POST' });
+                    }
+                } else {
+                    res = await fetch('/api/init-user', { method: 'POST' });
+                }
+                if (!res.ok) throw new Error('init failed');
+                const user = await res.json();
+                if (user.user_key) localStorage.setItem(LAB_KEY, user.user_key);
+                applyLabUser(user);
+                loadPulse();
+            } catch (err) {
+                const box = document.getElementById('lab-user');
+                if (box) {
+                    box.classList.remove('hidden');
+                    box.classList.add('flex');
+                    document.getElementById('lab-energy').innerText = '⚡ —';
+                    document.getElementById('lab-nick').innerText = 'Нет связи с пропусками';
+                    document.getElementById('lab-key').innerText = '';
+                }
+            }
+        }
+
+        function pulseAgo(stamp) {
+            if (!stamp) return '';
+            const t = Date.parse(stamp.replace(' ', 'T'));
+            if (!t) return '';
+            const mins = Math.max(0, Math.round((Date.now() - t) / 60000));
+            if (mins < 1) return 'только что';
+            if (mins < 60) return mins + ' мин назад';
+            const hours = Math.floor(mins / 60);
+            if (hours < 24) return hours + ' ч назад';
+            return Math.floor(hours / 24) + ' дн назад';
+        }
+
+        function applyPulse(pulse) {
+            if (!pulse) return;
+            document.getElementById('pulse-today').innerText = pulse.today;
+            document.getElementById('pulse-all').innerText = 'всего ' + pulse.all;
+            const bar = document.getElementById('pulse-bar');
+            bar.style.width = pulse.today ? Math.min(100, pulse.today * 20) + '%' : '0%';
+            const lastEl = document.getElementById('pulse-last');
+            if (!pulse.last) {
+                lastEl.innerText = 'Пока никто не проверял';
+                return;
+            }
+            lastEl.innerHTML = 'Последняя проверка: <span class="font-bold text-slate-700 dark:text-slate-200">' +
+                pulse.last.nickname + '</span> · ' + pulse.last.title + ' · ' + pulseAgo(pulse.last.created_at);
+        }
+
+        async function loadPulse() {
+            try {
+                const res = await fetch('/api/lab-pulse?t=' + Date.now());
+                if (!res.ok) return;
+                applyPulse(await res.json());
+            } catch (err) {}
+        }
+
+        document.getElementById('lab-nick').addEventListener('click', async () => {
+            if (!labUser || !labUser.user_key) return;
+            const next = window.prompt('Как тебя называть на площадке?', labUser.nickname);
+            if (next == null) return;
+            const res = await fetch('/api/rename', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + labUser.user_key },
+                body: JSON.stringify({ nickname: next })
+            });
+            const data = await res.json();
+            if (!res.ok) {
+                alert(data.error || 'Не вышло сменить имя');
+                return;
+            }
+            applyLabUser(data);
+        });
+
+        document.getElementById('lab-copy').addEventListener('click', async () => {
+            if (!labUser || !labUser.user_key) return;
+            try {
+                await navigator.clipboard.writeText(labUser.user_key);
+                const btn = document.getElementById('lab-copy');
+                btn.innerText = 'Скопировано';
+                setTimeout(() => { btn.innerText = 'Копировать'; }, 1400);
+            } catch (err) {}
+        });
+
+        document.getElementById('lab-restore-btn').addEventListener('click', async () => {
+            const pasted = window.prompt('Вставь свой ключ целиком (yasno_…)');
+            if (!pasted) return;
+            const key = pasted.trim();
+            try {
+                const res = await fetch('/api/init-user', { method: 'POST', headers: { Authorization: 'Bearer ' + key } });
+                const user = await res.json();
+                if (!res.ok || !user.user_key) throw new Error(user.error || 'bad key');
+                localStorage.setItem(LAB_KEY, user.user_key);
+                applyLabUser(user);
+            } catch (err) {
+                alert('Такого пропуска нет. Проверь строку или открой страницу заново.');
+            }
+        });
+
+        function setHypoOpen(open) {
+            document.body.classList.toggle('hypo-open', !!open);
+            const modal = document.getElementById('hypo-modal');
+            if (modal) modal.setAttribute('aria-hidden', open ? 'false' : 'true');
+        }
+
+        function formatReportR(value) {
+            const n = Number(value) || 0;
+            const abs = Math.abs(n).toFixed(1);
+            return (n > 0 ? '+' : n < 0 ? '−' : '') + abs + ' R';
+        }
+
+        async function submitHypothesis(event) {
+            event.preventDefault();
+            const errBox = document.getElementById('hypo-error');
+            const reportBox = document.getElementById('hypo-report');
+            const btn = document.getElementById('hypo-run');
+            errBox.classList.add('hidden');
+            const form = event.target;
+            const payload = {
+                symbol: form.symbol.value,
+                target_r: Number(form.target_r.value),
+                session: form.session.value,
+                days: 90
+            };
+            if (!labUser || !labUser.user_key) {
+                errBox.innerText = 'Сначала нужен пропуск в шапке.';
+                errBox.classList.remove('hidden');
+                return;
+            }
+            btn.disabled = true;
+            btn.innerText = 'Считаем…';
+            try {
+                const res = await fetch('/api/test-idea', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: 'Bearer ' + labUser.user_key
+                    },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+                if (data.user) applyLabUser(data.user);
+                if (!res.ok) throw new Error(data.error || 'Не удалось проверить');
+                const r = data.report;
+                reportBox.classList.remove('hidden');
+                reportBox.innerHTML =
+                    '<div class="text-xs font-bold text-slate-400 uppercase tracking-wider">Отчёт · ' + r.from + ' — ' + r.to + '</div>' +
+                    '<div class="font-bold text-slate-900 dark:text-white">' + r.title + '</div>' +
+                    '<div class="text-2xl font-extrabold ' + (r.sum_r >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-500') + '">' + formatReportR(r.sum_r) + '</div>' +
+                    '<div class="text-sm text-slate-600 dark:text-slate-300">Закрыто ' + r.closed +
+                    ' · до цели ' + r.win_rate_pct + '% · среднее ' + r.ev +
+                    ' R на вероятность · <b>' + r.trades_per_week + ' вероятностей в неделю</b></div>' +
+                    '<p class="text-sm text-slate-600 dark:text-slate-300">' + r.minus + '</p>' +
+                    '<p class="text-sm text-slate-600 dark:text-slate-300">' + r.plus + '</p>' +
+                    '<p class="text-[11px] text-slate-400">' + r.note + ' Окно: ' + r.session + '. Списано 5 энергии.</p>';
+                if (data.pulse) applyPulse(data.pulse);
+            } catch (err) {
+                errBox.innerText = err.message || 'Не удалось прогнать вероятность.';
+                errBox.classList.remove('hidden');
+            } finally {
+                btn.disabled = false;
+                btn.innerText = 'Прогнать · −5⚡';
+            }
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') setHypoOpen(false);
+        });
+
+        bootLabUser();
+
         function toggleTheme() {
             const html = document.documentElement;
             const icon = document.getElementById('theme-icon');
@@ -724,15 +1032,41 @@
             }
         }
 
-        // Логика чата ИИ
         const chatMessages = document.getElementById('chat-messages');
         const chatInput = document.getElementById('chat-input');
+        const aiDock = document.getElementById('ai-dock');
+        const aiPanel = document.getElementById('ai-panel');
+        const aiOrb = document.getElementById('ai-orb');
+        let aiWelcomed = false;
+
+        function setAiDock(open) {
+            const isOpen = !!open;
+            aiDock.classList.toggle('open', isOpen);
+            document.body.classList.toggle('ai-open', isOpen);
+            if (aiPanel) aiPanel.setAttribute('aria-hidden', isOpen ? 'false' : 'true');
+            if (aiOrb) aiOrb.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+            if (isOpen) {
+                if (!aiWelcomed) {
+                    aiWelcomed = true;
+                    addMessage('Могу пояснить погоду рынка и цифры на арене ботов. Это лаборатория, не советы.', false);
+                }
+                setTimeout(() => { if (chatInput) chatInput.focus(); }, 280);
+            }
+        }
+
+        function toggleAiDock() {
+            setAiDock(!aiDock.classList.contains('open'));
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && aiDock.classList.contains('open')) setAiDock(false);
+        });
 
         const knowledgeBase = {
-            "что с золотом?": "По золоту (XAU/USD) зафиксирован режим <b>«Бычий шторм»</b>. Наблюдается сильный импульс с пробоем максимумов сессии. Трендовые алгоритмы ищут сетапы на покупку (Pullback) при откатном движении.",
-            "почему сработал бот 1?": "<b>Бот #1 (Impulse Pullback)</b> активировался, так как рыночные условия Золота полностью соответствуют его профилю — «Бычий шторм». Он успешно вошел на откате после слома структуры на M15 со сбалансированным Risk/Reward.",
-            "объясни последний сбой": "Сбой (-1 R) произошел во время выхода блока новостей США. Резкий спайк волатильности задел стоп-лосс до возобновления основного движения. Это штатная погрешность при работе алгоритмов в момент турбулентности.",
-            "default": "Я отслеживаю показатели платформы Yasno.trade. Вы можете спросить меня о состоянии Золота/Серебра, эффективности ботов или причинах активации конкретной модели."
+            "что с золотом?": "По золоту смотри карточку погоды выше: ход и сила считаются по закрытым часовикам, не по советам ботов.",
+            "кто лидирует на арене?": "",
+            "объясни последний сбой": "Чат пока не читает причины закрытий. На арене можно раскрыть карточку — там последние закрытые в R.",
+            "default": "Я пока отвечаю коротко по карточкам на странице: погода рынка и арена ботов. Это не советы."
         };
 
         function addMessage(text, isUser = false) {
@@ -778,11 +1112,14 @@
                 
                 const lowerQuery = query.toLowerCase().trim();
                 let response = knowledgeBase["default"];
-                
-                for (const key in knowledgeBase) {
-                    if (lowerQuery.includes(key.toLowerCase())) {
-                        response = knowledgeBase[key];
-                        break;
+                if (lowerQuery.includes('кто лидирует') || lowerQuery.includes('арене')) {
+                    response = arenaLeaderReply();
+                } else {
+                    for (const key in knowledgeBase) {
+                        if (key !== 'default' && lowerQuery.includes(key.toLowerCase())) {
+                            response = knowledgeBase[key];
+                            break;
+                        }
                     }
                 }
                 
@@ -821,6 +1158,80 @@
         return (n > 0 ? '+' : n < 0 ? '−' : '') + abs + ' R';
     }
 
+    const ARENA_STATUS = {
+        live: { badge: 'bg-emerald-500 text-white shadow-sm', icon: 'ph-bold ph-check-circle', tone: 'text-emerald-700 dark:text-emerald-400' },
+        wait: { badge: 'bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-400 border border-amber-300/60 dark:border-amber-500/30', icon: 'ph-bold ph-hourglass-high', tone: 'text-amber-700 dark:text-amber-400' },
+        stale: { badge: 'bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300', icon: 'ph-bold ph-clock', tone: 'text-slate-500 dark:text-slate-400' },
+        offline: { badge: 'bg-rose-100 dark:bg-rose-900/40 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-500/30', icon: 'ph-bold ph-wifi-slash', tone: 'text-rose-600 dark:text-rose-400' }
+    };
+
+    function arenaLeaderReply() {
+        if (!heroData || !heroData.bots || !heroData.bots.length) {
+            return 'Сводка по ботам ещё не подгрузилась. Обновите страницу через минуту.';
+        }
+        const leader = heroData.bots[0];
+        const week = leader.trades_per_week != null ? leader.trades_per_week : '—';
+        return '<b>' + leader.title + '</b> сейчас первый по сумме в R: ' + formatR(leader.sum_r) +
+            '. Досчитано ' + leader.closed + ', в среднем ' + week + ' вероятностей в неделю. Это лаборатория, не совет.';
+    }
+
+    function renderArenaCard(bot, highlight) {
+        const look = ARENA_STATUS[bot.status] || ARENA_STATUS.wait;
+        const rClass = bot.sum_r > 0
+            ? 'text-emerald-600 dark:text-emerald-400'
+            : bot.sum_r < 0
+                ? 'text-rose-500 dark:text-rose-400'
+                : 'text-slate-800 dark:text-white';
+        const sparkStroke = bot.sum_r >= 0 ? 'stroke-emerald-500' : 'stroke-rose-500';
+        const spark = bot.sparkline || { line: 'M5,15 L95,15' };
+        const glow = highlight ? ' glow-active bg-white/90 dark:bg-slate-800/90' : '';
+        const dim = (bot.status === 'offline' || bot.status === 'wait') ? ' opacity-80' : '';
+        let recentHtml = '<div class="text-[11px] text-center text-slate-500 dark:text-slate-400 italic">Пока нет закрытых</div>';
+        if (bot.recent && bot.recent.length) {
+            recentHtml = '<div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Последние закрытые</div>' +
+                bot.recent.map(row => {
+                    const plus = Number(row.r) > 0;
+                    const minus = Number(row.r) < 0;
+                    const color = plus ? 'text-emerald-600 dark:text-emerald-400' : minus ? 'text-rose-500 dark:text-rose-400' : 'text-slate-600 dark:text-slate-300';
+                    const dot = plus ? 'bg-emerald-500' : minus ? 'bg-rose-500' : 'bg-slate-400';
+                    return '<div class="flex justify-between items-center bg-slate-50 dark:bg-slate-800/50 p-2 rounded-lg border border-slate-100 dark:border-white/5">' +
+                        '<div class="flex items-center gap-2"><div class="w-1.5 h-1.5 rounded-full ' + dot + '"></div>' +
+                        '<span class="text-xs font-medium text-slate-700 dark:text-slate-300">' + (row.label || '') +
+                        (row.when ? ' · ' + row.when : '') + '</span></div>' +
+                        '<span class="text-xs font-bold ' + color + '">' + formatR(row.r) + '</span></div>';
+                }).join('');
+        }
+        return '<div class="glass-panel p-4 text-slate-800 dark:text-white relative flex flex-col gap-3 glass-panel-hover bot-card' + glow + dim + '" onclick="toggleBotDetails(\'' + bot.id + '\')">' +
+            '<div class="flex justify-between items-start">' +
+            '<div><h3 class="font-bold text-base text-slate-900 dark:text-white">' + (bot.title || bot.name) + '</h3>' +
+            '<span class="text-xs font-medium text-slate-500 dark:text-slate-400">' + (bot.metal || '') + '</span></div>' +
+            '<span class="text-[11px] font-extrabold px-2.5 py-0.5 rounded-full ' + look.badge + '">' + (bot.status_label || '') + '</span></div>' +
+            '<div class="flex justify-between items-end">' +
+            '<div class="text-3xl font-extrabold tracking-tight ' + rClass + '">' + formatR(bot.sum_r) + '</div>' +
+            '<div class="w-16 h-8 opacity-80 mb-1"><svg viewBox="0 0 100 30" class="w-full h-full fill-none ' + sparkStroke + '" stroke-width="3" stroke-linecap="round">' +
+            '<path d="' + spark.line + '"></path></svg></div></div>' +
+            '<div class="text-xs font-medium flex items-center justify-between pt-2 border-t border-slate-100 dark:border-white/5 ' + look.tone + '">' +
+            '<span class="flex items-center gap-1.5"><i class="' + look.icon + ' text-base"></i> ' + (bot.footnote || '') + '</span>' +
+            '<i class="ph-bold ph-caret-down text-slate-400 transition-transform" id="' + bot.id + '-icon"></i></div>' +
+            '<div id="' + bot.id + '-details" class="bot-details"><div class="bot-details-inner flex flex-col gap-2 pt-3">' + recentHtml + '</div></div></div>';
+    }
+
+    function applyArena(data) {
+        const grid = document.getElementById('arena-grid');
+        const hint = document.getElementById('arena-hint');
+        const bots = (data && data.bots) ? data.bots.slice() : [];
+        if (!grid) return;
+        if (!bots.length) {
+            if (hint) hint.innerText = 'Нет сводки по ботам';
+            grid.innerHTML = '<div class="sm:col-span-2 text-sm text-slate-500 dark:text-slate-400 py-8 text-center">Нет связи со сводкой демо-ботов</div>';
+            return;
+        }
+        const online = bots.filter(bot => bot.online).length;
+        if (hint) hint.innerText = online + '/' + bots.length + ' на связи · цифры в R';
+        const top = bots[0];
+        grid.innerHTML = bots.map(bot => renderArenaCard(bot, bot.id === top.id && top.sum_r > 0)).join('');
+    }
+
     function applyHero(period) {
         if (!heroData) return;
         heroPeriod = period;
@@ -837,7 +1248,6 @@
         document.getElementById('hero-spark-line').setAttribute('d', spark.line);
         document.getElementById('hero-spark-area').setAttribute('d', spark.area);
         document.getElementById('hero-wr-val').innerText = wr.toFixed(1) + '%';
-        document.getElementById('hero-wr-label').innerText = heroData.realization.label;
         document.getElementById('hero-wr-gauge').setAttribute('stroke-dasharray', wr + ', 100');
         document.getElementById('hero-agents-online').innerText = heroData.agents.online;
         document.getElementById('hero-agents-total').innerText = heroData.agents.total;
@@ -865,12 +1275,155 @@
             if (!res.ok) throw new Error('hero json missing');
             heroData = await res.json();
             applyHero(heroPeriod);
+            applyArena(heroData);
         } catch (err) {
             document.getElementById('hero-profit-caption-text').innerText = 'Нет связи со сводкой демо-ботов';
+            applyArena(null);
         }
     }
 
     loadHero();
+
+    const WX_STYLE = {
+        up: { card: 'border-emerald-200/80 dark:border-emerald-500/30 bg-emerald-50/40 dark:bg-emerald-900/10', badge: 'bg-emerald-500 shadow-emerald-500/30', stroke: 'stroke-emerald-500', fill: 'fill-emerald-500/10' },
+        down: { card: 'border-rose-200/80 dark:border-rose-500/30 bg-rose-50/40 dark:bg-rose-900/10', badge: 'bg-rose-500 shadow-rose-500/30', stroke: 'stroke-rose-500', fill: 'fill-rose-500/10' },
+        side: { card: 'border-cyan-200/80 dark:border-cyan-500/30 bg-cyan-50/40 dark:bg-cyan-900/10', badge: 'bg-cyan-500 shadow-cyan-500/30', stroke: 'stroke-cyan-500', fill: 'fill-cyan-500/10' },
+        storm: { card: 'border-amber-300/90 dark:border-amber-500/40 bg-amber-50/50 dark:bg-amber-900/15', badge: 'bg-amber-500 shadow-amber-500/30', stroke: 'stroke-amber-500', fill: 'fill-amber-500/10' },
+        front: { card: 'border-amber-300/90 dark:border-amber-500/40 bg-amber-50/50 dark:bg-amber-900/15', badge: 'bg-amber-500 shadow-amber-500/30', stroke: 'stroke-amber-500', fill: 'fill-amber-500/10' },
+        stormIcon: 'ph-bold ph-lightning',
+        windIcon: 'ph-bold ph-wind',
+        strongIcon: 'ph-bold ph-trend-up',
+        calmIcon: 'ph-bold ph-waves',
+        frontIcon: 'ph-bold ph-cloud-lightning'
+    };
+
+    let weatherAssets = { xau: null, xag: null };
+
+    function wxLook(asset) {
+        if (asset.weather === 'storm' || asset.weather === 'front') return WX_STYLE.storm;
+        return WX_STYLE[asset.direction] || WX_STYLE.side;
+    }
+
+    function weatherAgo(stamp) {
+        if (!stamp) return 'Закрытые часовики H1';
+        const t = Date.parse(stamp.replace(' ', 'T'));
+        if (!t) return 'Закрытые часовики H1';
+        const mins = Math.max(0, Math.round((Date.now() - t) / 60000));
+        if (mins < 1) return 'Обновлено только что';
+        if (mins < 60) return 'Обновлено ' + mins + 'м назад';
+        return 'Обновлено ' + Math.floor(mins / 60) + 'ч назад';
+    }
+
+    function positionLine(asset) {
+        const price = asset.display_price_text || asset.tick?.price_text || asset.close_text;
+        const high = asset.last_high ? asset.last_high.price_text : null;
+        const low = asset.last_low ? asset.last_low.price_text : null;
+        if (asset.position === 'above_high' && high) return 'Цена ' + price + ' — выше последнего max ' + high;
+        if (asset.position === 'below_low' && low) return 'Цена ' + price + ' — ниже последнего min ' + low;
+        if (asset.position === 'near_high' && high) return 'Цена ' + price + ' — у последнего max ' + high;
+        if (asset.position === 'near_low' && low) return 'Цена ' + price + ' — у последнего min ' + low;
+        if (high && low) return 'Цена ' + price + ' — между max ' + high + ' и min ' + low;
+        return 'Цена ' + price;
+    }
+
+    function applyLivePrice(prefix, priceText, live) {
+        const asset = weatherAssets[prefix];
+        if (!asset || !priceText) return;
+        const price = Number(String(priceText).replace(',', '.'));
+        const high = asset.last_high ? Number(asset.last_high.price) : null;
+        const low = asset.last_low ? Number(asset.last_low.price) : null;
+        if (high != null && price >= high) asset.position = 'above_high';
+        else if (low != null && price <= low) asset.position = 'below_low';
+        else if (high != null && low != null) {
+            const pos = (price - low) / (high - low || 1);
+            asset.position = pos >= 0.66 ? 'near_high' : pos <= 0.34 ? 'near_low' : 'middle';
+        }
+        asset.display_price_text = priceText;
+        document.getElementById('wx-' + prefix + '-price').innerText = priceText;
+        document.getElementById('wx-' + prefix + '-price-note').innerText = live ? 'Текущая цена · тик' : 'Цена закрытого часовика';
+        document.getElementById('wx-' + prefix + '-pos').innerText = positionLine(asset);
+    }
+
+    function applyAssetWeather(prefix, asset) {
+        weatherAssets[prefix] = asset;
+        const style = wxLook(asset);
+        const card = document.getElementById('wx-' + prefix + '-card');
+        card.className = 'glass-panel p-4 border rounded-2xl relative overflow-hidden ' + style.card;
+        const badge = document.getElementById('wx-' + prefix + '-badge');
+        badge.className = 'inline-flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-lg text-white shadow-sm ' + style.badge;
+        const icons = { storm: WX_STYLE.stormIcon, wind: WX_STYLE.windIcon, strong: WX_STYLE.strongIcon, calm: WX_STYLE.calmIcon, front: WX_STYLE.frontIcon };
+        badge.querySelector('i').className = icons[asset.weather] || 'ph-bold ph-circle';
+        document.getElementById('wx-' + prefix + '-badge-text').innerText = asset.badge;
+        document.getElementById('wx-' + prefix + '-summary').innerText = asset.summary;
+        const adxEl = document.getElementById('wx-' + prefix + '-adx');
+        const adxBar = document.getElementById('wx-' + prefix + '-adx-bar');
+        const adxText = (asset.adx != null)
+            ? Number(asset.adx).toFixed(0) + ' · ' + (asset.adx_label || '')
+            : '—';
+        if (adxEl) adxEl.innerText = adxText;
+        if (adxBar) {
+            adxBar.style.width = (asset.adx_bar_pct || 0) + '%';
+            adxBar.className = 'h-full rounded-full ' + (asset.weather === 'storm' || asset.weather === 'front' ? 'bg-amber-500' : asset.direction === 'down' ? 'bg-rose-500' : asset.direction === 'side' ? 'bg-cyan-500' : 'bg-emerald-500');
+        }
+        const svg = document.getElementById('wx-' + prefix + '-svg');
+        svg.className = 'w-full h-full fill-none ' + style.stroke;
+        svg.setAttribute('stroke-width', '2');
+        document.getElementById('wx-' + prefix + '-area').setAttribute('class', style.fill + ' stroke-none');
+        document.getElementById('wx-' + prefix + '-line').setAttribute('d', asset.sparkline.line);
+        document.getElementById('wx-' + prefix + '-area').setAttribute('d', asset.sparkline.area);
+        const highMark = document.getElementById('wx-' + prefix + '-mark-high');
+        const lowMark = document.getElementById('wx-' + prefix + '-mark-low');
+        if (asset.sparkline.high) {
+            highMark.setAttribute('cx', asset.sparkline.high.x);
+            highMark.setAttribute('cy', asset.sparkline.high.y);
+            highMark.classList.remove('hidden');
+        } else {
+            highMark.classList.add('hidden');
+        }
+        if (asset.sparkline.low) {
+            lowMark.setAttribute('cx', asset.sparkline.low.x);
+            lowMark.setAttribute('cy', asset.sparkline.low.y);
+            lowMark.classList.remove('hidden');
+        } else {
+            lowMark.classList.add('hidden');
+        }
+        document.getElementById('wx-' + prefix + '-high').innerText = asset.last_high
+            ? asset.last_high.price_text + ' · ' + asset.last_high.label
+            : 'нет якоря';
+        document.getElementById('wx-' + prefix + '-low').innerText = asset.last_low
+            ? asset.last_low.price_text + ' · ' + asset.last_low.label
+            : 'нет якоря';
+        const seed = asset.tick?.price_text || asset.close_text;
+        applyLivePrice(prefix, seed, Boolean(asset.tick));
+    }
+
+    async function loadTicks() {
+        try {
+            const res = await fetch('/api/ticks?t=' + Date.now());
+            if (!res.ok) return;
+            const ticks = await res.json();
+            if (ticks.xau?.price_text) applyLivePrice('xau', ticks.xau.price_text, true);
+            if (ticks.xag?.price_text) applyLivePrice('xag', ticks.xag.price_text, true);
+        } catch (err) {}
+    }
+
+    async function loadWeather() {
+        try {
+            const res = await fetch('data/lab_weather.json?t=' + Date.now());
+            if (!res.ok) throw new Error('weather json missing');
+            const data = await res.json();
+            applyAssetWeather('xau', data.xau);
+            applyAssetWeather('xag', data.xag);
+            document.getElementById('wx-focus').innerText = data.focus;
+            document.getElementById('wx-updated').innerText = weatherAgo(data.updated_at);
+            await loadTicks();
+        } catch (err) {
+            document.getElementById('wx-focus').innerText = 'Нет снимка часовиков. Сначала: python scripts/collect_lab_weather.py';
+        }
+    }
+
+    loadWeather();
+    setInterval(loadTicks, 60000);
 
     // 2. Drill-down для ботов (Раскрывающийся аккордеон)
     function toggleBotDetails(botId) {
@@ -887,16 +1440,7 @@
         }
     }
 
-    // 3. Проактивный ИИ (Push-инсайт)
-    window.addEventListener('DOMContentLoaded', () => {
-        // Имитация события, когда ИИ сам решает дать инсайт через 3 секунды после загрузки
-        setTimeout(() => {
-            const toast = document.getElementById('proactive-toast');
-            if (toast) {
-                toast.style.display = 'flex';
-            }
-        }, 3000); 
-    });
+    // Фейковый пуш про «бота #4» больше не показываем.
 
 </script>
 </body>
