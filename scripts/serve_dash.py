@@ -153,7 +153,7 @@ class Handler(SimpleHTTPRequestHandler):
             self.end_headers()
             return
         if route == "/api/health":
-            _json_bytes({"ok": True}, 200, self)
+            _json_bytes({"ok": True, "lab": "ai-3"}, 200, self)
             return
         if route == "/api/ticks":
             try:

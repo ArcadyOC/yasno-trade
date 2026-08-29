@@ -246,9 +246,42 @@ def _via_urllib(payload: dict) -> dict:
         raise RuntimeError("Модель недоступна.") from err
 
 
+def _via_tls_client(payload: dict) -> dict:
+    try:
+        import tls_client
+    except ImportError as err:
+        raise _Skip() from err
+    key = api_key()
+    last_error = "Модель не ответила."
+    for ident in ("chrome_120", "chrome112", "firefox_120"):
+        try:
+            session = tls_client.Session(client_identifier=ident, random_tls_extension_order=True)
+            resp = session.post(
+                OPENROUTER_URL,
+                headers=_headers(key),
+                json=payload,
+                timeout_seconds=50,
+            )
+        except Exception as err:
+            print("openrouter tls_client", ident, type(err).__name__, file=sys.stderr, flush=True)
+            last_error = "Модель недоступна."
+            continue
+        status = int(getattr(resp, "status_code", 0) or 0)
+        text = getattr(resp, "text", "") or ""
+        if status >= 400:
+            last_error = _friendly_http_error(status, text)
+            print("openrouter tls_client", ident, status, file=sys.stderr, flush=True)
+            if status != 403:
+                raise RuntimeError(last_error)
+            continue
+        data = resp.json()
+        return data if isinstance(data, dict) else json.loads(text)
+    raise RuntimeError(last_error)
+
+
 def _openrouter_chat(payload: dict) -> dict:
     last = "Модель недоступна."
-    for sender in (_via_powershell, _via_curl_cffi, _via_urllib):
+    for sender in (_via_powershell, _via_tls_client, _via_curl_cffi, _via_urllib):
         try:
             return sender(payload)
         except _Skip:
