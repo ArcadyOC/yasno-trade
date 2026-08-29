@@ -7,7 +7,11 @@ from datetime import datetime, timedelta
 import MetaTrader5 as mt5
 import pandas as pd
 
+from chain_strategy import ElasticReclaimStrategy
+from impulse_strategy import VolumeImpulseStrategy
+from observe_strategy import SqueezeBreakoutStrategy
 from pinbar_strategy import PinbarSweepStrategy
+from trend_strategy import TrendPullbackStrategy
 
 SYMBOLS = {"xau": ("XAUUSD", "Золото"), "xag": ("XAGUSD", "Серебро")}
 DAYS_RU = {
@@ -20,6 +24,20 @@ DAYS_RU = {
     "Sunday": "воскресенье",
 }
 
+# ключ паттерна -> (класс стратегии, нужен ли контекст старших часов H1, название для отчёта)
+PATTERNS = {
+    "sweep": (PinbarSweepStrategy, True, "ложный пробой"),
+    "trend": (TrendPullbackStrategy, True, "тренд"),
+    "chain": (ElasticReclaimStrategy, False, "цепочка"),
+    "impulse": (VolumeImpulseStrategy, False, "импульс"),
+    "observe": (SqueezeBreakoutStrategy, False, "наблюдение"),
+}
+
+TIMEFRAMES = {
+    "m15": {"mt5": mt5.TIMEFRAME_M15, "label": "15 минут", "bar_minutes": 15, "per_day": 96},
+    "h1": {"mt5": mt5.TIMEFRAME_H1, "label": "1 час", "bar_minutes": 60, "per_day": 24},
+}
+
 
 def _bars(symbol: str, timeframe, count: int) -> pd.DataFrame:
     rates = mt5.copy_rates_from_pos(symbol, timeframe, 0, count + 1)
@@ -28,7 +46,10 @@ def _bars(symbol: str, timeframe, count: int) -> pd.DataFrame:
     df = pd.DataFrame(rates)
     df["time"] = pd.to_datetime(df["time"], unit="s")
     df = df.iloc[:-1].copy()
-    df = df[["time", "open", "high", "low", "close"]]
+    cols = ["time", "open", "high", "low", "close"]
+    if "tick_volume" in df.columns:
+        cols.append("tick_volume")
+    df = df[cols]
     df.set_index("time", inplace=True)
     return df
 
@@ -73,11 +94,28 @@ def _facts(trades: list[dict]) -> tuple[str, str]:
     return minus, plus
 
 
-def run_hypothesis(symbol_key: str, target_r: float, session: str, days: int = 90) -> dict:
+def run_hypothesis(
+    symbol_key: str,
+    pattern_key: str,
+    timeframe_key: str,
+    target_r: float,
+    session: str,
+    days: int = 90,
+) -> dict:
     pair = SYMBOLS.get(symbol_key)
     if not pair:
         raise ValueError("Можно проверить только золото или серебро.")
     symbol, title = pair
+
+    pattern = PATTERNS.get(pattern_key)
+    if not pattern:
+        raise ValueError("Такого паттерна нет.")
+    strategy_cls, needs_context, pattern_title = pattern
+
+    tf = TIMEFRAMES.get(timeframe_key)
+    if not tf:
+        raise ValueError("Таймфрейм — 15 минут или 1 час.")
+
     if target_r not in (1.5, 2.0, 2.5):
         raise ValueError("Цель может быть 1.5, 2 или 2.5 R.")
     if session not in ("all", "day"):
@@ -86,32 +124,42 @@ def run_hypothesis(symbol_key: str, target_r: float, session: str, days: int = 9
     if not mt5.initialize():
         raise RuntimeError("Нет связи с терминалом. Открой MetaTrader и попробуй ещё раз.")
     try:
-        m15_need = max(days * 96, 800)
-        h1_need = max(days * 24, 200)
-        m15 = _bars(symbol, mt5.TIMEFRAME_M15, m15_need)
-        h1 = _bars(symbol, mt5.TIMEFRAME_H1, h1_need)
+        main_need = max(days * tf["per_day"], 800 if timeframe_key == "m15" else 400)
+        main_df = _bars(symbol, tf["mt5"], main_need)
+        h1 = None
+        if needs_context:
+            if timeframe_key == "h1":
+                h1 = main_df
+            else:
+                h1_need = max(days * 24, 200)
+                h1 = _bars(symbol, mt5.TIMEFRAME_H1, h1_need)
     finally:
         mt5.shutdown()
 
-    if m15.empty:
+    if main_df.empty:
         raise RuntimeError("Не удалось взять историю свечей.")
 
-    cutoff = m15.index.max() - timedelta(days=days)
-    m15 = m15[m15.index >= cutoff]
-    if h1.empty:
-        h1 = m15.resample("1h").agg({"open": "first", "high": "max", "low": "min", "close": "last"}).dropna()
+    cutoff = main_df.index.max() - timedelta(days=days)
+    main_df = main_df[main_df.index >= cutoff]
 
-    strategy = PinbarSweepStrategy()
-    strategy.set_hourly_context(h1)
+    strategy = strategy_cls()
+    if needs_context:
+        if h1 is None or h1.empty:
+            h1 = main_df.resample("1h").agg(
+                {"open": "first", "high": "max", "low": "min", "close": "last"}
+            ).dropna()
+        strategy.set_hourly_context(h1)
+        if hasattr(strategy, "bar_minutes"):
+            strategy.bar_minutes = tf["bar_minutes"]
 
     trades: list[dict] = []
     in_trade = False
     sl_price = tp_price = 0.0
     pending = None
 
-    for i in range(1, len(m15)):
-        candle = m15.iloc[i]
-        stamp = m15.index[i]
+    for i in range(1, len(main_df)):
+        candle = main_df.iloc[i]
+        stamp = main_df.index[i]
         if in_trade:
             if candle["low"] <= sl_price:
                 pending["r"] = -1.0
@@ -124,7 +172,7 @@ def run_hypothesis(symbol_key: str, target_r: float, session: str, days: int = 9
             continue
         if not _in_session(stamp, session):
             continue
-        setup = strategy.check_setup(m15, i)
+        setup = strategy.check_setup(main_df, i)
         if not setup or setup["direction"] != "long":
             continue
         risk = setup["entry_price"] - setup["sl_price"]
@@ -141,17 +189,19 @@ def run_hypothesis(symbol_key: str, target_r: float, session: str, days: int = 9
     n = len(trades)
     wins = sum(1 for row in trades if row["r"] > 0)
     total_r = sum(row["r"] for row in trades)
-    span_days = max((m15.index.max() - m15.index.min()).days, 1)
+    span_days = max((main_df.index.max() - main_df.index.min()).days, 1)
     per_week = n / (span_days / 7) if n else 0.0
     minus, plus = _facts(trades)
     session_label = "только день (08–17 UTC)" if session == "day" else "все часы"
     return {
-        "title": f"{title} · 15 минут · пинбар · цель {target_r:g} R",
+        "title": f"{title} · {tf['label']} · {pattern_title} · цель {target_r:g} R",
         "symbol": title,
+        "pattern": pattern_title,
+        "timeframe": tf["label"],
         "days": days,
         "session": session_label,
-        "from": m15.index.min().strftime("%d.%m.%Y"),
-        "to": m15.index.max().strftime("%d.%m.%Y"),
+        "from": main_df.index.min().strftime("%d.%m.%Y"),
+        "to": main_df.index.max().strftime("%d.%m.%Y"),
         "closed": n,
         "wins": wins,
         "win_rate_pct": round(100 * wins / n, 1) if n else 0.0,

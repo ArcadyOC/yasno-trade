@@ -134,6 +134,28 @@
             box-shadow: 0 0 25px rgba(16, 185, 129, 0.18), 0 10px 25px -5px rgba(16, 185, 129, 0.1) !important;
         }
 
+        #lab-energy.lab-energy-founder {
+            color: #10b981;
+            text-shadow: 0 0 8px rgba(16, 185, 129, 0.95), 0 0 18px rgba(52, 211, 153, 0.7);
+        }
+
+        .dark #lab-energy.lab-energy-founder {
+            color: #34d399;
+            text-shadow: 0 0 10px rgba(52, 211, 153, 0.95), 0 0 22px rgba(16, 185, 129, 0.65);
+        }
+
+        #lab-stars {
+            color: #fbbf24;
+            text-shadow: 0 0 8px rgba(251, 191, 36, 0.95), 0 0 16px rgba(245, 158, 11, 0.7);
+            letter-spacing: 0.06em;
+            line-height: 1;
+        }
+
+        .dark #lab-stars {
+            color: #fcd34d;
+            text-shadow: 0 0 10px rgba(252, 211, 77, 0.95), 0 0 18px rgba(251, 191, 36, 0.7);
+        }
+
         /* Кастомный аккуратный скроллбар */
         .custom-scrollbar::-webkit-scrollbar {
             width: 5px;
@@ -194,7 +216,7 @@
             display: flex;
             flex-direction: column;
             align-items: flex-end;
-            gap: 0.85rem;
+            pointer-events: none;
         }
 
         .ai-backdrop {
@@ -220,6 +242,7 @@
 
         .ai-orb {
             position: relative;
+            pointer-events: auto;
             width: 4.35rem;
             height: 4.35rem;
             border-radius: 999px;
@@ -309,6 +332,9 @@
         .ai-dock.open .ai-orb .ai-orb-close { display: block; }
 
         .ai-panel {
+            position: absolute;
+            right: 0;
+            bottom: calc(4.35rem + 0.85rem);
             width: min(24.5rem, calc(100vw - 1.5rem));
             height: min(34rem, calc(100vh - 8rem));
             display: flex;
@@ -372,6 +398,39 @@
             pointer-events: auto;
             transform: translate(-50%, -50%) scale(1);
         }
+
+        .lab-header {
+            position: relative;
+            z-index: 55;
+            overflow: visible;
+        }
+        .rules-wrap { position: relative; }
+        .rules-panel {
+            position: fixed;
+            top: 4.5rem;
+            right: 1.25rem;
+            width: min(26rem, calc(100vw - 2rem));
+            max-height: min(72vh, 40rem);
+            overflow: auto;
+            z-index: 65;
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transform: translateY(-8px);
+            transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s ease;
+        }
+        body.rules-open .rules-panel {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+            transform: none;
+        }
+        #rules-more-btn .rules-caret {
+            transition: transform 0.2s ease;
+        }
+        #rules-more-btn[aria-expanded="true"] .rules-caret {
+            transform: rotate(180deg);
+        }
     </style>
 </head>
 <body class="bg-brand-bg dark:bg-brand-bg-dark text-slate-800 dark:text-slate-100 min-h-screen p-4 sm:p-6 lg:p-8 flex flex-col items-center selection:bg-cyan-500 selection:text-white">
@@ -392,7 +451,7 @@
     <div class="w-full max-w-6xl flex flex-col gap-6">
         
             <!-- HEADER MODULE -->
-        <header class="glass-panel px-6 py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+        <header class="lab-header glass-panel px-6 py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
             <div class="flex items-center gap-3.5">
                 <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 via-emerald-400 to-emerald-500 flex items-center justify-center shadow-md shadow-cyan-500/20 text-white">
                     <i class="ph-bold ph-chart-line-up text-xl"></i>
@@ -410,10 +469,21 @@
                     <span id="lab-energy" class="text-amber-600 dark:text-amber-400 font-bold whitespace-nowrap">⚡ —</span>
                     <span class="text-slate-300 dark:text-slate-600">|</span>
                     <button type="button" id="lab-nick" title="Сменить имя" class="whitespace-nowrap hover:text-cyan-600 dark:hover:text-cyan-400">…</button>
+                    <span id="lab-stars" class="hidden text-[13px] font-bold whitespace-nowrap" aria-hidden="true"></span>
+                    <span id="lab-role" class="text-[11px] font-bold text-cyan-700 dark:text-cyan-400 whitespace-nowrap">…</span>
                     <span class="text-slate-300 dark:text-slate-600">|</span>
                     <span id="lab-key" class="font-mono text-[11px] text-slate-500 dark:text-slate-400">ключ…</span>
                     <button type="button" id="lab-copy" title="Скопировать ключ" class="text-cyan-600 dark:text-cyan-400 hover:underline">Копировать</button>
                     <button type="button" id="lab-restore-btn" title="Вставить другой ключ" class="text-slate-400 hover:text-cyan-600 dark:hover:text-cyan-400">Ключ</button>
+                </div>
+
+                <div id="rules-wrap" class="rules-wrap">
+                    <button type="button" id="rules-btn" onclick="toggleRules(event)"
+                            class="px-3 py-1.5 rounded-full bg-slate-50 dark:bg-slate-800/70 border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 hover:text-cyan-600 dark:hover:text-cyan-400 flex items-center gap-1.5"
+                            title="Как тут играют" aria-expanded="false" aria-controls="rules-panel">
+                        <i class="ph-bold ph-book-open text-sm"></i>
+                        <span>Правила</span>
+                    </button>
                 </div>
 
                 <!-- Статус активности -->
@@ -520,7 +590,7 @@
                 <div class="flex items-end justify-between w-full z-10">
                     <div class="flex flex-col relative">
                         <span class="text-2xl sm:text-3xl font-extrabold text-slate-800 dark:text-white tracking-tight flex items-baseline gap-1.5 whitespace-nowrap">
-                            <span id="hero-agents-online">—</span> <span class="text-sm font-semibold text-slate-400 dark:text-slate-500">/ <span id="hero-agents-total">5</span></span>
+                            <span id="hero-agents-online">—</span> <span class="text-sm font-semibold text-slate-400 dark:text-slate-500">/ <span id="hero-agents-total">7</span></span>
                         </span>
                         <span id="hero-agents-label" class="text-[11px] font-medium text-emerald-600 dark:text-emerald-400 mt-1.5 flex items-center gap-1.5 whitespace-nowrap">
                             <span class="relative flex h-2 w-2">
@@ -679,7 +749,7 @@
                         </div>
                         <h2 class="text-lg font-bold text-slate-900 dark:text-white">Арена ботов</h2>
                     </div>
-                    <span id="arena-hint" class="text-xs font-semibold text-slate-400 dark:text-slate-400">Пять демо-систем · в R</span>
+                    <span id="arena-hint" class="text-xs font-semibold text-slate-400 dark:text-slate-400">Нажми плитку — идея и закрытые</span>
                 </div>
                 
                 <div id="arena-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -731,7 +801,7 @@
                 </div>
                 <div class="min-w-0">
                     <h3 class="font-bold text-slate-900 dark:text-white text-sm">Спросить лабораторию</h3>
-                    <p class="text-[11px] font-medium text-slate-500 dark:text-cyan-400/80 truncate">Пояснит карточки на странице. Не советы.</p>
+                    <p id="chat-cost-hint" class="text-[11px] font-medium text-slate-500 dark:text-cyan-400/80 truncate">Пояснит карточки. Вопрос −10⚡. Не советы.</p>
                 </div>
             </div>
             <button type="button" onclick="setAiDock(false)" title="Закрыть диалог"
@@ -755,7 +825,7 @@
                 </button>
             </div>
             <div class="relative flex items-center">
-                <input type="text" id="chat-input" placeholder="Спросите о погоде или ботах..."
+                <input type="text" id="chat-input" placeholder="Вопрос · −10⚡"
                        class="w-full bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-white/10 rounded-xl py-2.5 pl-3.5 pr-11 text-xs font-medium text-slate-800 dark:text-white placeholder-slate-400 focus:outline-none focus:border-cyan-500 transition-colors"
                        onkeypress="handleKeyPress(event)">
                 <button onclick="handleSend()" class="absolute right-1.5 p-1.5 rounded-lg bg-cyan-500 hover:bg-cyan-600 text-white flex items-center justify-center transition-colors shadow-md shadow-cyan-500/20">
@@ -773,12 +843,51 @@
     </button>
 </div>
 
+<div id="rules-panel" class="rules-panel glass-panel p-4 text-left shadow-xl" role="dialog" aria-label="Правила игры">
+    <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Как тут играют</div>
+    <ol class="text-xs leading-relaxed text-slate-600 dark:text-slate-300 space-y-2 list-decimal pl-4">
+        <li>Это лаборатория. Никто не говорит «покупай» или «продавай».</li>
+        <li>Ключ — пропуск. С ним имя и энергия. Скопируй и спрячь.</li>
+        <li>Первый заход — стажёр. На экране всё то же, что у других. Энергия 100 из 100. Любой вопрос и любой прогон стоят 10.</li>
+        <li>Свою идею можно предложить сразу, с нуля. Если она шесть недель в плюсе по сумме в R — звезда.</li>
+        <li>Цифры в R — сколько целей уложилось в один риск. Это не деньги.</li>
+        <li>У ботов своя идея вероятности. Нажми плитку — прочитаешь и увидишь последние закрытые.</li>
+        <li>Имя меняется. Чужой ключ вставляется кнопкой «Ключ». Обновление страницы не даёт новую сотню.</li>
+    </ol>
+    <button type="button" id="rules-more-btn" onclick="toggleRulesMore(event)"
+            class="mt-3 w-full flex items-center justify-between gap-2 px-2 py-1.5 rounded-lg text-xs font-bold text-cyan-700 dark:text-cyan-400 hover:bg-slate-100 dark:hover:bg-white/5"
+            aria-expanded="false" aria-controls="rules-more">
+        <span>Подробнее</span>
+        <i class="ph-bold ph-caret-down rules-caret text-sm"></i>
+    </button>
+    <div id="rules-more" class="hidden mt-2 pt-2 border-t border-slate-200/80 dark:border-white/10 text-xs leading-relaxed text-slate-600 dark:text-slate-300 space-y-3">
+        <div>
+            <div class="font-bold text-slate-800 dark:text-slate-100 mb-1">Кто ты</div>
+            <p class="mb-1.5"><b>Стажёр.</b> Пришёл первый раз. Видит всё: погоду, ботов, цифры. Энергия 100. Каждый вопрос и каждый прогон — 10. Может сразу предлагать свои идеи и копить звёзды с нуля.</p>
+            <p class="mb-1.5"><b>Исследователь.</b> Одна своя идея шесть недель в плюсе по сумме в R — первая звезда. Запрос уже стоит 5. На двух звёздах то же: всё видно, запрос 5, идёт к профи.</p>
+            <p class="mb-1.5"><b>Профи.</b> Три такие идеи — три звезды. Энергия всегда 100 из 100. Спрашивает и проверяет сколько хочет.</p>
+            <p><b>Хозяин платформы</b> один. Это не ступенька лестницы. Энергия у него всегда полная.</p>
+        </div>
+        <div>
+            <div class="font-bold text-slate-800 dark:text-slate-100 mb-1">Как дают звезду</div>
+            <p class="mb-1.5">Идея привязана к человеку: это его гипотеза, не чужая.</p>
+            <p class="mb-1.5">Шесть недель итог в плюсе по сумме в R. Когда сравниваем идеи, смотрим ещё среднее число закрытий в неделю — иначе плюс может быть одной удачей и тишиной.</p>
+            <p>Звёзды горят рядом с именем, только если они уже есть. Нет звёзд — пустых мест нет, ничего не светится.</p>
+        </div>
+        <div>
+            <div class="font-bold text-slate-800 dark:text-slate-100 mb-1">Зачем так</div>
+            <p class="mb-1.5">Экран никому не режем. Разница только в цене запроса и в том, кончается энергия или нет.</p>
+            <p class="mb-1.5">Устойчивые идеи хозяин может смотреть уже на своём реальном рынке.</p>
+            <p>Лаборатория живёт на добровольной поддержке, как на Гитхабе. Как именно переводить и как это устроить по закону — решим отдельно.</p>
+        </div>
+    </div>
+</div>
 <div id="hypo-backdrop" class="hypo-backdrop" onclick="setHypoOpen(false)"></div>
 <section id="hypo-modal" class="hypo-modal glass-panel p-5 flex flex-col gap-4" aria-hidden="true">
     <div class="flex items-start justify-between gap-3">
         <div>
             <h3 class="font-bold text-slate-900 dark:text-white text-base">Прогнать вероятность</h3>
-            <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Прогон по закрытым свечам за 90 дней. Списывается 5 энергии. Не совет.</p>
+            <p id="hypo-cost-note" class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Прогон по закрытым свечам за 90 дней. Списывается 10 энергии. Не совет.</p>
         </div>
         <button type="button" onclick="setHypoOpen(false)" class="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800">
             <i class="ph-bold ph-x text-base"></i>
@@ -791,9 +900,19 @@
                 <option value="xag">Серебро</option>
             </select>
         </label>
-        <label class="text-xs font-semibold text-slate-500 dark:text-slate-400 flex flex-col gap-1">Правило
-            <select name="rule" class="rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900 px-3 py-2 text-sm text-slate-800 dark:text-white">
-                <option value="pinbar">Пинбар · хвост больше 60%</option>
+        <label class="text-xs font-semibold text-slate-500 dark:text-slate-400 flex flex-col gap-1">Паттерн
+            <select name="pattern" id="hypo-pattern" class="rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900 px-3 py-2 text-sm text-slate-800 dark:text-white" onchange="updatePatternNote()">
+                <option value="sweep">Ложный пробой</option>
+                <option value="trend">Тренд</option>
+                <option value="chain">Цепочка</option>
+                <option value="impulse">Импульс</option>
+                <option value="observe">Наблюдение</option>
+            </select>
+        </label>
+        <label class="text-xs font-semibold text-slate-500 dark:text-slate-400 flex flex-col gap-1">Таймфрейм
+            <select name="timeframe" class="rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900 px-3 py-2 text-sm text-slate-800 dark:text-white">
+                <option value="m15">15 минут</option>
+                <option value="h1">1 час</option>
             </select>
         </label>
         <label class="text-xs font-semibold text-slate-500 dark:text-slate-400 flex flex-col gap-1">Цель
@@ -809,9 +928,10 @@
                 <option value="day">Только день (Лондон–Нью-Йорк)</option>
             </select>
         </label>
+        <p id="hypo-pattern-note" class="sm:col-span-2 text-xs text-slate-500 dark:text-slate-400 -mt-1"></p>
         <div class="sm:col-span-2 flex items-center justify-between gap-3 pt-1">
-            <span class="text-xs text-slate-500">Свеча 15 минут · глубина 90 дней</span>
-            <button type="submit" id="hypo-run" class="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-bold shadow-md shadow-emerald-500/20">Прогнать · −5⚡</button>
+            <span class="text-xs text-slate-500">Глубина 90 дней</span>
+            <button type="submit" id="hypo-run" class="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-bold shadow-md shadow-emerald-500/20">Прогнать · −10⚡</button>
         </div>
     </form>
     <div id="hypo-error" class="hidden text-sm text-rose-600 dark:text-rose-400"></div>
@@ -823,13 +943,62 @@
         const LAB_KEY = 'yasno_access_key';
         let labUser = null;
 
+        function costPhrase(cost) {
+            if (!cost) return 'энергия не тратится';
+            return '−' + cost + '⚡';
+        }
+
+        function applyActionCost(cost) {
+            const n = Number(cost);
+            const paid = Number.isFinite(n) ? n : 10;
+            const hint = document.getElementById('chat-cost-hint');
+            if (hint) {
+                hint.innerText = paid
+                    ? ('Пояснит карточки. Вопрос ' + costPhrase(paid) + '. Не советы.')
+                    : 'Пояснит карточки. Энергия не тратится. Не советы.';
+            }
+            const input = document.getElementById('chat-input');
+            if (input) input.placeholder = paid ? ('Вопрос · ' + costPhrase(paid)) : 'Вопрос · энергия не тратится';
+            const note = document.getElementById('hypo-cost-note');
+            if (note) {
+                note.innerText = paid
+                    ? ('Прогон по закрытым свечам за 90 дней. Списывается ' + paid + ' энергии. Не совет.')
+                    : 'Прогон по закрытым свечам за 90 дней. Энергия не тратится. Не совет.';
+            }
+            const btn = document.getElementById('hypo-run');
+            if (btn && btn.innerText !== 'Считаем…') {
+                btn.innerText = paid ? ('Прогнать · ' + costPhrase(paid)) : 'Прогнать';
+            }
+        }
+
         function applyLabUser(user) {
             labUser = user;
             const box = document.getElementById('lab-user');
             if (!box || !user) return;
-            document.getElementById('lab-energy').innerText = '⚡ ' + user.energy + '/' + user.energy_max;
+            const energyEl = document.getElementById('lab-energy');
+            energyEl.innerText = '⚡ ' + user.energy + '/' + user.energy_max;
+            const locked = !!(user.energy_locked || user.role === 'founder' || user.role === 'pro');
+            energyEl.classList.toggle('lab-energy-founder', locked);
+            energyEl.classList.toggle('text-amber-600', !locked);
+            energyEl.classList.toggle('dark:text-amber-400', !locked);
             document.getElementById('lab-nick').innerText = user.nickname;
+            const starsEl = document.getElementById('lab-stars');
+            const stars = Math.max(0, Math.min(3, Number(user.stars) || 0));
+            if (starsEl) {
+                if (stars > 0) {
+                    starsEl.innerText = '★'.repeat(stars);
+                    starsEl.classList.remove('hidden');
+                    starsEl.setAttribute('title', stars + ' из 3');
+                } else {
+                    starsEl.innerText = '';
+                    starsEl.classList.add('hidden');
+                    starsEl.removeAttribute('title');
+                }
+            }
+            const roleEl = document.getElementById('lab-role');
+            if (roleEl) roleEl.innerText = user.role_label || user.rank_label || '';
             document.getElementById('lab-key').innerText = (user.user_key || '').slice(0, 12) + '…';
+            applyActionCost(user.action_cost);
             box.classList.remove('hidden');
             box.classList.add('flex');
         }
@@ -943,10 +1112,26 @@
             }
         });
 
+        const PATTERN_NOTES = {
+            sweep: 'Цена выносит край последних свечей и закрывается обратно внутрь — ловим возврат.',
+            trend: 'Быстрая средняя развернулась по ходу старших часов, цена откатила к ней и оттолкнулась.',
+            chain: 'Цена растянута от средней как резинка, потом ложный выход за край и возврат обратно.',
+            impulse: 'Резкий ход с объёмом заметно выше обычного — не шум, а начало движения.',
+            observe: 'Сжатие полос Боллинджера, потом сильный выход за край — но не в перегретый рынок.'
+        };
+
+        function updatePatternNote() {
+            const select = document.getElementById('hypo-pattern');
+            const note = document.getElementById('hypo-pattern-note');
+            if (!select || !note) return;
+            note.innerText = PATTERN_NOTES[select.value] || '';
+        }
+
         function setHypoOpen(open) {
             document.body.classList.toggle('hypo-open', !!open);
             const modal = document.getElementById('hypo-modal');
             if (modal) modal.setAttribute('aria-hidden', open ? 'false' : 'true');
+            if (open) updatePatternNote();
         }
 
         function formatReportR(value) {
@@ -964,6 +1149,8 @@
             const form = event.target;
             const payload = {
                 symbol: form.symbol.value,
+                pattern: form.pattern.value,
+                timeframe: form.timeframe.value,
                 target_r: Number(form.target_r.value),
                 session: form.session.value,
                 days: 90
@@ -998,22 +1185,81 @@
                     ' R на вероятность · <b>' + r.trades_per_week + ' вероятностей в неделю</b></div>' +
                     '<p class="text-sm text-slate-600 dark:text-slate-300">' + r.minus + '</p>' +
                     '<p class="text-sm text-slate-600 dark:text-slate-300">' + r.plus + '</p>' +
-                    '<p class="text-[11px] text-slate-400">' + r.note + ' Окно: ' + r.session + '. Списано 5 энергии.</p>';
+                    '<p class="text-[11px] text-slate-400">' + r.note + ' Окно: ' + r.session + '. ' +
+                    (data.cost === 0 ? 'Энергия не тратится.' : ('Списано ' + data.cost + ' энергии.')) + '</p>';
                 if (data.pulse) applyPulse(data.pulse);
             } catch (err) {
                 errBox.innerText = err.message || 'Не удалось прогнать вероятность.';
                 errBox.classList.remove('hidden');
             } finally {
                 btn.disabled = false;
-                btn.innerText = 'Прогнать · −5⚡';
+                btn.innerText = (labUser && !labUser.action_cost) ? 'Прогнать' : ('Прогнать · ' + costPhrase((labUser && labUser.action_cost) || 10));
             }
         }
 
+        function placeRulesPanel() {
+            const btn = document.getElementById('rules-btn');
+            const panel = document.getElementById('rules-panel');
+            if (!btn || !panel) return;
+            const box = btn.getBoundingClientRect();
+            panel.style.top = Math.round(box.bottom + 10) + 'px';
+            panel.style.right = Math.max(16, Math.round(window.innerWidth - box.right)) + 'px';
+        }
+
+        function setRulesMoreOpen(open) {
+            const btn = document.getElementById('rules-more-btn');
+            const box = document.getElementById('rules-more');
+            if (btn) btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+            if (box) box.classList.toggle('hidden', !open);
+            if (document.body.classList.contains('rules-open')) placeRulesPanel();
+        }
+
+        function toggleRulesMore(event) {
+            if (event) event.stopPropagation();
+            const btn = document.getElementById('rules-more-btn');
+            const now = btn && btn.getAttribute('aria-expanded') === 'true';
+            setRulesMoreOpen(!now);
+        }
+
+        function setRulesOpen(open) {
+            const btn = document.getElementById('rules-btn');
+            document.body.classList.toggle('rules-open', open);
+            if (btn) btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+            if (open) {
+                placeRulesPanel();
+                localStorage.setItem('yasno_rules_seen', '1');
+            } else {
+                setRulesMoreOpen(false);
+            }
+        }
+
+        function toggleRules(event) {
+            if (event) event.stopPropagation();
+            setRulesOpen(!document.body.classList.contains('rules-open'));
+        }
+
+        document.addEventListener('click', (e) => {
+            if (!document.body.classList.contains('rules-open')) return;
+            const wrap = document.getElementById('rules-wrap');
+            const panel = document.getElementById('rules-panel');
+            if ((wrap && wrap.contains(e.target)) || (panel && panel.contains(e.target))) return;
+            setRulesOpen(false);
+        });
+        window.addEventListener('resize', () => {
+            if (document.body.classList.contains('rules-open')) placeRulesPanel();
+        });
+
         document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') setHypoOpen(false);
+            if (e.key === 'Escape') {
+                setHypoOpen(false);
+                setRulesOpen(false);
+            }
         });
 
         bootLabUser();
+        if (!localStorage.getItem('yasno_rules_seen')) {
+            setTimeout(() => setRulesOpen(true), 400);
+        }
 
         function toggleTheme() {
             const html = document.documentElement;
@@ -1090,8 +1336,54 @@
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }
 
-        function simulateAIResponse(query) {
-            // Индикатор набора ответа
+        function cannedLabReply(query) {
+            const lowerQuery = query.toLowerCase().trim();
+            if (lowerQuery.includes('кто лидирует') || lowerQuery.includes('арене')) {
+                return arenaLeaderReply();
+            }
+            for (const key in knowledgeBase) {
+                if (key !== 'default' && lowerQuery.includes(key.toLowerCase())) {
+                    return knowledgeBase[key];
+                }
+            }
+            return knowledgeBase.default;
+        }
+
+        function labAskContext() {
+            const period = typeof heroPeriod !== 'undefined' ? heroPeriod : 'all';
+            const bots = (heroData && heroData.bots) ? heroData.bots.map(bot => ({
+                title: bot.title,
+                status: bot.status_label,
+                sum_r: bot.sum_r,
+                week: bot.trades_per_week,
+                idea: bot.idea || (BOT_IDEAS && BOT_IDEAS[bot.id]) || ''
+            })) : [];
+            return {
+                period: period,
+                sum_r: heroData && heroData.profit ? heroData.profit[period] : null,
+                to_goal: heroData && heroData.realization ? heroData.realization[period] : null,
+                gold: (document.getElementById('wx-xau-summary') || {}).innerText || '',
+                silver: (document.getElementById('wx-xag-summary') || {}).innerText || '',
+                bots: bots
+            };
+        }
+
+        function escapeHtml(text) {
+            return String(text || '').replace(/[&<>"']/g, ch => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+            }[ch]));
+        }
+
+        let labAskBusy = false;
+
+        async function askLabPaid(query) {
+            if (labAskBusy) return;
+            if (!labUser || !labUser.user_key) {
+                addMessage('Сначала нужен пропуск в шапке.', false);
+                return;
+            }
+            labAskBusy = true;
+            addMessage(query, true);
             const typingDiv = document.createElement('div');
             typingDiv.id = 'typing-indicator';
             typingDiv.className = 'flex gap-3 max-w-[85%] message-anim';
@@ -1105,35 +1397,35 @@
             `;
             chatMessages.appendChild(typingDiv);
             chatMessages.scrollTop = chatMessages.scrollHeight;
-
-            setTimeout(() => {
+            try {
+                const res = await fetch('/api/ask-lab', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: 'Bearer ' + labUser.user_key
+                    },
+                    body: JSON.stringify({ question: query, context: labAskContext() })
+                });
+                const data = await res.json();
+                if (data.user) applyLabUser(data.user);
+                if (!res.ok) throw new Error(data.error || 'Не хватило энергии.');
                 const indicator = document.getElementById('typing-indicator');
                 if (indicator) indicator.remove();
-                
-                const lowerQuery = query.toLowerCase().trim();
-                let response = knowledgeBase["default"];
-                if (lowerQuery.includes('кто лидирует') || lowerQuery.includes('арене')) {
-                    response = arenaLeaderReply();
-                } else {
-                    for (const key in knowledgeBase) {
-                        if (key !== 'default' && lowerQuery.includes(key.toLowerCase())) {
-                            response = knowledgeBase[key];
-                            break;
-                        }
-                    }
-                }
-                
-                addMessage(response, false);
-            }, 700 + Math.random() * 400);
+                addMessage(data.reply ? escapeHtml(data.reply) : cannedLabReply(query), false);
+            } catch (err) {
+                const indicator = document.getElementById('typing-indicator');
+                if (indicator) indicator.remove();
+                addMessage(err.message || 'Не удалось спросить лабораторию.', false);
+            } finally {
+                labAskBusy = false;
+            }
         }
 
         function handleSend() {
             const text = chatInput.value.trim();
-            if (text) {
-                addMessage(text, true);
-                chatInput.value = '';
-                simulateAIResponse(text);
-            }
+            if (!text) return;
+            chatInput.value = '';
+            askLabPaid(text);
         }
 
         function handleKeyPress(e) {
@@ -1143,9 +1435,8 @@
         }
 
         function sendPrompt(text) {
-        addMessage(text, true);
-        simulateAIResponse(text);
-    }
+            askLabPaid(text);
+        }
 
     // --- НОВЫЙ ИНТЕРАКТИВНЫЙ ФУНКЦИОНАЛ ---
 
@@ -1163,6 +1454,16 @@
         wait: { badge: 'bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-400 border border-amber-300/60 dark:border-amber-500/30', icon: 'ph-bold ph-hourglass-high', tone: 'text-amber-700 dark:text-amber-400' },
         stale: { badge: 'bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300', icon: 'ph-bold ph-clock', tone: 'text-slate-500 dark:text-slate-400' },
         offline: { badge: 'bg-rose-100 dark:bg-rose-900/40 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-500/30', icon: 'ph-bold ph-wifi-slash', tone: 'text-rose-600 dark:text-rose-400' }
+    };
+
+    const BOT_IDEAS = {
+        'xau-trend': 'Ищет момент, когда быстрые средние на 15 минутах золота смотрят в ту же сторону, что и старшие часы. Цель дальше риска примерно в два с половиной раза. Если направление ломается — выход.',
+        'xag-trend': 'Та же семейная идея, что у золота, но на серебре: 15 минут и старшие часы. Иногда ждёт откат к быстрой средней и только потом считает вероятность.',
+        'planner': 'Три шага подряд на 5 минутах: цена оттянулась как резинка, потом ложный выход за край, потом заход обратно. Берёт только если все три сложились. Живее на серебре.',
+        'idea-004-observe': 'Ждёт сжатие, потом выход цены за край полос — и только если ход уже сильный. Если рынок перегрет, вероятность пропускает. Свеча 15 минут, серебро.',
+        'mv-m5-impulse': 'Ловит самое начало резкого хода на серебре, 5 минут: цена ушла, объём выше обычного, ход не шум. Смотрит Лондон и Нью-Йорк.',
+        'xag-sweep': 'На серебре, свеча 15 минут. Цена выбивает край последних пяти свечей и закрывается обратно. Стоп чуть за этим краем, цель дальше риска в два с половиной раза. Смотрит только дневные часы в будни. По пробе около 15 закрытий в неделю.',
+        'xau-sweep': 'Та же идея ложного края, но на золоте: 15 минут, вынос последних пяти свечей и закрытие обратно. Стоп чуть за краем, цель дальше риска в два с половиной раза. Дневные часы, будни. По пробе около 18 закрытий в неделю.'
     };
 
     function arenaLeaderReply() {
@@ -1186,6 +1487,12 @@
         const spark = bot.sparkline || { line: 'M5,15 L95,15' };
         const glow = highlight ? ' glow-active bg-white/90 dark:bg-slate-800/90' : '';
         const dim = (bot.status === 'offline' || bot.status === 'wait') ? ' opacity-80' : '';
+        const idea = bot.idea || BOT_IDEAS[bot.id] || '';
+        const ideaHtml = idea
+            ? '<div class="rounded-xl bg-cyan-50/70 dark:bg-cyan-950/20 border border-cyan-100 dark:border-cyan-500/20 p-3">' +
+                '<div class="text-[10px] font-bold text-cyan-700/80 dark:text-cyan-400 uppercase tracking-wider mb-1">В чём идея</div>' +
+                '<p class="text-xs leading-relaxed text-slate-600 dark:text-slate-300">' + idea + '</p></div>'
+            : '';
         let recentHtml = '<div class="text-[11px] text-center text-slate-500 dark:text-slate-400 italic">Пока нет закрытых</div>';
         if (bot.recent && bot.recent.length) {
             recentHtml = '<div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Последние закрытые</div>' +
@@ -1213,7 +1520,7 @@
             '<div class="text-xs font-medium flex items-center justify-between pt-2 border-t border-slate-100 dark:border-white/5 ' + look.tone + '">' +
             '<span class="flex items-center gap-1.5"><i class="' + look.icon + ' text-base"></i> ' + (bot.footnote || '') + '</span>' +
             '<i class="ph-bold ph-caret-down text-slate-400 transition-transform" id="' + bot.id + '-icon"></i></div>' +
-            '<div id="' + bot.id + '-details" class="bot-details"><div class="bot-details-inner flex flex-col gap-2 pt-3">' + recentHtml + '</div></div></div>';
+            '<div id="' + bot.id + '-details" class="bot-details"><div class="bot-details-inner flex flex-col gap-2 pt-3">' + ideaHtml + recentHtml + '</div></div></div>';
     }
 
     function applyArena(data) {
@@ -1227,7 +1534,7 @@
             return;
         }
         const online = bots.filter(bot => bot.online).length;
-        if (hint) hint.innerText = online + '/' + bots.length + ' на связи · цифры в R';
+        if (hint) hint.innerText = online + '/' + bots.length + ' на связи · нажми плитку — идея';
         const top = bots[0];
         grid.innerHTML = bots.map(bot => renderArenaCard(bot, bot.id === top.id && top.sum_r > 0)).join('');
     }

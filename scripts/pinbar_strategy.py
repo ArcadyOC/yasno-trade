@@ -14,6 +14,7 @@ class PinbarSweepStrategy(BaseStrategy):
         self._atr_values = None
         self._atr_df_id = None
         self.h1 = None
+        self.bar_minutes = 15
 
     def set_hourly_context(self, h1_df: pd.DataFrame):
         """Часовые свечи для режима рынка. Без заглядывания в незакрытый час."""
@@ -55,7 +56,7 @@ class PinbarSweepStrategy(BaseStrategy):
     def _h1_is_bull(self, m15_open) -> bool:
         if self.h1 is None:
             return False
-        signal_close = m15_open + timedelta(minutes=15)
+        signal_close = m15_open + timedelta(minutes=self.bar_minutes)
         usable = self.h1[self.h1["h1_close_time"] <= signal_close]
         if usable.empty:
             return False

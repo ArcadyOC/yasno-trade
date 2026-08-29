@@ -1,4 +1,4 @@
-"""Сводка трёх верхних карточек dashlitefin из пяти демо-ботов kvant_lab."""
+"""Сводка трёх верхних карточек dashlitefin из демо-ботов kvant_lab."""
 
 from __future__ import annotations
 
@@ -13,11 +13,41 @@ ONLINE_MAX_AGE = timedelta(hours=2)
 STALE_AFTER = timedelta(days=10)
 
 BOT_FACES = {
-    "xau-trend": {"title": "Золото · тренд", "metal": "Золото"},
-    "xag-trend": {"title": "Серебро · тренд", "metal": "Серебро"},
-    "planner": {"title": "Оба металла · цепочка", "metal": "Золото и серебро"},
-    "idea-004-observe": {"title": "Серебро · наблюдение", "metal": "Серебро"},
-    "mv-m5-impulse": {"title": "Серебро · импульс", "metal": "Серебро"},
+    "xau-trend": {
+        "title": "Золото · тренд",
+        "metal": "Золото",
+        "idea": "Ищет момент, когда быстрые средние на 15 минутах золота смотрят в ту же сторону, что и старшие часы. Цель дальше риска примерно в два с половиной раза. Если направление ломается — выход.",
+    },
+    "xag-trend": {
+        "title": "Серебро · тренд",
+        "metal": "Серебро",
+        "idea": "Та же семейная идея, что у золота, но на серебре: 15 минут и старшие часы. Иногда ждёт откат к быстрой средней и только потом считает вероятность.",
+    },
+    "planner": {
+        "title": "Оба металла · цепочка",
+        "metal": "Золото и серебро",
+        "idea": "Три шага подряд на 5 минутах: цена оттянулась как резинка, потом ложный выход за край, потом заход обратно. Берёт только если все три сложились. Живее на серебре.",
+    },
+    "idea-004-observe": {
+        "title": "Серебро · наблюдение",
+        "metal": "Серебро",
+        "idea": "Ждёт сжатие, потом выход цены за край полос — и только если ход уже сильный. Если рынок перегрет, вероятность пропускает. Свеча 15 минут, серебро.",
+    },
+    "mv-m5-impulse": {
+        "title": "Серебро · импульс",
+        "metal": "Серебро",
+        "idea": "Ловит самое начало резкого хода на серебре, 5 минут: цена ушла, объём выше обычного, ход не шум. Смотрит Лондон и Нью-Йорк.",
+    },
+    "xag-sweep": {
+        "title": "Серебро · ложный пробой",
+        "metal": "Серебро",
+        "idea": "На серебре, свеча 15 минут. Цена выбивает край последних пяти свечей и закрывается обратно. Стоп чуть за этим краем, цель дальше риска в два с половиной раза. Смотрит только дневные часы в будни. По пробе около 15 закрытий в неделю.",
+    },
+    "xau-sweep": {
+        "title": "Золото · ложный пробой",
+        "metal": "Золото",
+        "idea": "Та же идея ложного края, но на золоте: 15 минут, вынос последних пяти свечей и закрытие обратно. Стоп чуть за краем, цель дальше риска в два с половиной раза. Дневные часы, будни. По пробе около 18 закрытий в неделю.",
+    },
 }
 
 
@@ -200,11 +230,15 @@ def collect() -> dict:
         "planner": KVANT_LAB / "demo_bots" / "planner" / "bot" / "data" / "live_stats.json",
         "idea-004-observe": KVANT_LAB / "demo_bots" / "xagusd" / "idea_004_observe" / "data" / "bot_state.json",
         "mv-m5-impulse": KVANT_LAB / "demo_bots" / "xagusd" / "mv_m5_impulse" / "data" / "bot_state.json",
+        "xag-sweep": KVANT_LAB / "demo_bots" / "xagusd" / "06silver_sweep_monitor" / "data" / "bot_state.json",
+        "xau-sweep": KVANT_LAB / "demo_bots" / "xauusd" / "07gold_sweep_monitor" / "data" / "bot_state.json",
     }
     extra_fresh = {
         "xau-trend": KVANT_LAB / "demo_bots" / "xauusd" / "data" / "bot_state.json",
         "xag-trend": KVANT_LAB / "demo_bots" / "xagusd" / "trend-silver" / "current" / "data" / "bot_state_xagusd.json",
         "planner": KVANT_LAB / "demo_bots" / "planner" / "bot" / "state.json",
+        "xag-sweep": KVANT_LAB / "demo_bots" / "xagusd" / "06silver_sweep_monitor" / "data" / "bot_state.json",
+        "xau-sweep": KVANT_LAB / "demo_bots" / "xauusd" / "07gold_sweep_monitor" / "data" / "bot_state.json",
     }
 
     closed: list[dict] = []
@@ -272,13 +306,14 @@ def collect() -> dict:
                     "when": row["exit_at"].strftime("%d.%m %H:%M") if row["exit_at"] else "",
                 }
             )
-        face = BOT_FACES.get(name, {"title": name, "metal": ""})
+        face = BOT_FACES.get(name, {"title": name, "metal": "", "idea": ""})
         per_bot.append(
             {
                 "id": name,
                 "name": name,
                 "title": face["title"],
                 "metal": face["metal"],
+                "idea": face.get("idea") or "",
                 "online": is_online,
                 "status": status,
                 "status_label": status_label,

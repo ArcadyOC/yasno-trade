@@ -20,6 +20,7 @@ credentials.json
 # IDE / OS
 .idea/
 .vscode/
+.claude/
 .DS_Store
 Thumbs.db
 desktop.ini
@@ -28,3 +29,6 @@ desktop.ini
 *.log
 logs/
 data/lab_users.db
+
+# Scratch/disposable
+tmp/
