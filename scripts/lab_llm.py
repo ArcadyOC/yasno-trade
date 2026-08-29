@@ -14,7 +14,6 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 MODEL = "deepseek/deepseek-v4-flash"
-PROMPT_PATH = ROOT / "docs" / "prompt-ai.md"
 OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
 TIMEWEB_URL = "https://api.timeweb.ai/v1/chat/completions"
 TIMEWEB_MODEL_FALLBACKS = (
@@ -48,9 +47,12 @@ class _Skip(Exception):
 
 
 def system_prompt() -> str:
-    if PROMPT_PATH.exists():
-        return PROMPT_PATH.read_text(encoding="utf-8") + SCREEN_RULES
-    return SCREEN_RULES.strip()
+    return (
+        "Ты аналитик лаборатории Yasno.trade. Отвечай по-русски, коротко и по-человечески. "
+        "Опирайся только на сводку. Не давай торговых советов и не выдумывай цифры. "
+        "Картинки и видео не делаешь."
+        + SCREEN_RULES
+    )
 
 
 def load_env() -> None:
@@ -149,6 +151,56 @@ def _context_text(context: dict | None) -> str:
     return "\n".join(lines)
 
 
+def _parts_text(value: object) -> str:
+    if isinstance(value, str):
+        return value.strip()
+    if isinstance(value, list):
+        bits = []
+        for item in value:
+            if isinstance(item, str):
+                bits.append(item)
+            elif isinstance(item, dict):
+                bits.append(str(item.get("text") or item.get("content") or ""))
+        return " ".join(bit for bit in bits if bit).strip()
+    return ""
+
+
+def _extract_reply(body: dict | None) -> str:
+    data = body if isinstance(body, dict) else {}
+    choices = data.get("choices") if isinstance(data.get("choices"), list) else []
+    message = (choices[0] or {}).get("message") if choices else {}
+    if not isinstance(message, dict):
+        message = {}
+    for key in ("content", "reasoning_content"):
+        text = _parts_text(message.get(key))
+        if len(text) > 1:
+            return text
+    return _parts_text(data.get("output_text"))
+
+
+def _timeweb_payload(model: str, messages: list, max_tokens: int, extra: bool) -> dict:
+    payload = {
+        "model": model,
+        "temperature": 0.4,
+        "max_tokens": max_tokens,
+        "messages": messages,
+    }
+    if extra:
+        payload["max_completion_tokens"] = max_tokens
+        payload["reasoning_effort"] = "low"
+    return payload
+
+
+def _via_timeweb_try(model: str, messages: list, max_tokens: int) -> dict:
+    try:
+        return _via_timeweb(_timeweb_payload(model, messages, max_tokens, True))
+    except RuntimeError as err:
+        low = str(err).lower()
+        if any(mark in low for mark in ("модели нет", "ключ", "баланс", "режут")):
+            raise
+        return _via_timeweb(_timeweb_payload(model, messages, max_tokens, False))
+
+
 def _friendly_http_error(status: int, body: str) -> str:
     low = (body or "").lower()
     if status == 401:
@@ -186,15 +238,11 @@ def ask_lab(question: str, context: dict | None = None) -> str:
                 models.append(name)
         last_err = RuntimeError("Такой модели нет.")
         body = None
+        picked = ""
         for name in models:
-            payload = {
-                "model": name,
-                "temperature": 0.4,
-                "max_tokens": 500,
-                "messages": messages,
-            }
             try:
-                body = _via_timeweb(payload)
+                body = _via_timeweb_try(name, messages, 2500)
+                picked = name
                 break
             except RuntimeError as err:
                 last_err = err
@@ -202,23 +250,23 @@ def ask_lab(question: str, context: dict | None = None) -> str:
                     raise
         if body is None:
             raise last_err
+        text = _extract_reply(body)
+        if len(text) < 16:
+            body = _via_timeweb_try(picked, messages, 4000)
+            text = _extract_reply(body)
     else:
         payload = {
             "model": model_name(),
             "temperature": 0.4,
-            "max_tokens": 500,
+            "max_tokens": 2500,
             "messages": messages,
         }
         body = _openrouter_chat(payload)
+        text = _extract_reply(body)
     if isinstance(body, dict) and body.get("error"):
         err = body["error"]
         msg = err.get("message") if isinstance(err, dict) else str(err)
         raise RuntimeError(_friendly_http_error(0, str(msg)))
-    choices = body.get("choices") if isinstance(body, dict) else None
-    if not choices:
-        raise RuntimeError("Пустой ответ модели.")
-    message = (choices[0] or {}).get("message") or {}
-    text = (message.get("content") or "").strip()
     if not text:
         raise RuntimeError("Модель вернула пустой текст.")
     return text
@@ -231,7 +279,7 @@ def _via_timeweb(payload: dict) -> dict:
     body = json.dumps(payload, ensure_ascii=False).encode("utf-8")
     req = urllib.request.Request(TIMEWEB_URL, data=body, method="POST", headers=_headers(key))
     try:
-        with urllib.request.urlopen(req, timeout=50) as resp:
+        with urllib.request.urlopen(req, timeout=70) as resp:
             return json.loads(resp.read().decode("utf-8"))
     except urllib.error.HTTPError as err:
         detail = err.read().decode("utf-8", errors="replace")

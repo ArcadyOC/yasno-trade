@@ -158,7 +158,7 @@ class Handler(SimpleHTTPRequestHandler):
                 ai = "openrouter"
             else:
                 ai = "none"
-            _json_bytes({"ok": True, "lab": "ai-6", "ai": ai, "keys": env_key_names()}, 200, self)
+            _json_bytes({"ok": True, "lab": "ai-7", "ai": ai, "keys": env_key_names()}, 200, self)
             return
         if route == "/api/ticks":
             try:
