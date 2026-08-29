@@ -4,6 +4,10 @@ from __future__ import annotations
 
 import json
 import os
+import shutil
+import subprocess
+import sys
+import tempfile
 import urllib.error
 import urllib.request
 from pathlib import Path
@@ -11,6 +15,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 MODEL = "deepseek/deepseek-v4-flash"
 PROMPT_PATH = ROOT / "docs" / "prompt-ai.md"
+OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
 SCREEN_RULES = (
     "\n\n## 5. Вопросы по экрану лаборатории\n"
     "В этой версии нет прогона идей. Поясни карточки из сводки: погода рынка, арена ботов, "
@@ -21,6 +26,10 @@ SCREEN_RULES = (
     "Картинки и видео не делаешь. Если просят — вежливый отказ: только текст по сводке.\n"
     "Отвечай по-русски, коротко и по-человечески.\n"
 )
+
+
+class _Skip(Exception):
+    """Этот способ вызова здесь недоступен, пробуем следующий."""
 
 
 def system_prompt() -> str:
@@ -43,12 +52,15 @@ def load_env() -> None:
 
 def api_key() -> str:
     load_env()
-    return (os.environ.get("OPENROUTER_API_KEY") or "").strip()
+    key = (os.environ.get("OPENROUTER_API_KEY") or "").strip().strip('"').strip("'")
+    if key.lower().startswith("bearer "):
+        key = key[7:].strip()
+    return key
 
 
 def model_name() -> str:
     load_env()
-    return (os.environ.get("OPENROUTER_MODEL") or MODEL).strip()
+    return (os.environ.get("OPENROUTER_MODEL") or MODEL).strip().strip('"').strip("'")
 
 
 def _clip(text: object, limit: int) -> str:
@@ -87,10 +99,26 @@ def _context_text(context: dict | None) -> str:
     return "\n".join(lines)
 
 
+def _friendly_http_error(status: int, body: str) -> str:
+    low = (body or "").lower()
+    if status == 401:
+        return "Ключ модели сервер не принял. В Timeweb проверь имя переменной: OPENROUTER_API_KEY."
+    if status == 402:
+        return "На ключе модели нет доступного баланса."
+    if status == 403 and "security policy" in low:
+        return "Сеть сервера не пустила запрос к модели. Это не ключ — канал режут по дороге."
+    if status == 404:
+        return "Такой модели нет. Проверь OPENROUTER_MODEL."
+    snippet = " ".join((body or "").split())[:160]
+    if snippet:
+        return "Модель не ответила. " + snippet
+    return "Модель не ответила."
+
+
 def ask_lab(question: str, context: dict | None = None) -> str:
     key = api_key()
     if not key:
-        raise RuntimeError("Ключ модели ещё не лежит на сервере.")
+        raise RuntimeError("Ключ модели ещё не лежит на сервере. В Timeweb нужна переменная OPENROUTER_API_KEY.")
     q = _clip(question, 500)
     if not q:
         raise RuntimeError("Пустой вопрос.")
@@ -98,7 +126,6 @@ def ask_lab(question: str, context: dict | None = None) -> str:
         "model": model_name(),
         "temperature": 0.4,
         "max_tokens": 500,
-        "reasoning": {"exclude": True},
         "messages": [
             {"role": "system", "content": system_prompt()},
             {
@@ -108,6 +135,10 @@ def ask_lab(question: str, context: dict | None = None) -> str:
         ],
     }
     body = _openrouter_chat(payload)
+    if isinstance(body, dict) and body.get("error"):
+        err = body["error"]
+        msg = err.get("message") if isinstance(err, dict) else str(err)
+        raise RuntimeError(_friendly_http_error(0, str(msg)))
     choices = body.get("choices") if isinstance(body, dict) else None
     if not choices:
         raise RuntimeError("Пустой ответ модели.")
@@ -118,25 +149,111 @@ def ask_lab(question: str, context: dict | None = None) -> str:
     return text
 
 
-def _openrouter_chat(payload: dict) -> dict:
+def _headers(key: str) -> dict[str, str]:
+    return {
+        "Authorization": "Bearer " + key,
+        "Content-Type": "application/json; charset=utf-8",
+        "X-Title": "Yasno.trade",
+        "HTTP-Referer": "https://yasnotrade.ru",
+        "User-Agent": "YasnoLab/1.0",
+        "Accept": "application/json",
+    }
+
+
+def _via_powershell(payload: dict) -> dict:
+    if os.name != "nt":
+        raise _Skip()
+    key = api_key()
+    work = Path(tempfile.mkdtemp(prefix="yasno_or_"))
+    payload_path = work / "in.json"
+    out_path = work / "out.json"
+    script_path = work / "call.ps1"
+    payload_path.write_text(json.dumps(payload, ensure_ascii=False), encoding="utf-8")
+    script = f"""
+$ErrorActionPreference = "Stop"
+$key = $env:OPENROUTER_API_KEY
+if (-not $key) {{ throw "NO_KEY" }}
+$wc = New-Object System.Net.WebClient
+$wc.Encoding = [System.Text.Encoding]::UTF8
+$wc.Headers["Authorization"] = "Bearer $key"
+$wc.Headers["Content-Type"] = "application/json; charset=utf-8"
+$wc.Headers["X-Title"] = "Yasno.trade"
+$wc.Headers["HTTP-Referer"] = "https://yasnotrade.ru"
+$inBytes = [System.IO.File]::ReadAllBytes({json.dumps(str(payload_path))})
+$outBytes = $wc.UploadData({json.dumps(OPENROUTER_URL)}, "POST", $inBytes)
+[System.IO.File]::WriteAllBytes({json.dumps(str(out_path))}, $outBytes)
+"""
+    script_path.write_text(script, encoding="utf-8")
+    env = os.environ.copy()
+    env["OPENROUTER_API_KEY"] = key
+    try:
+        proc = subprocess.run(
+            ["powershell", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", str(script_path)],
+            capture_output=True,
+            text=True,
+            timeout=50,
+            env=env,
+        )
+        if proc.returncode != 0 or not out_path.exists():
+            err = (proc.stderr or proc.stdout or "нет ответа").strip()[:240]
+            raise RuntimeError("Модель не ответила. " + err)
+        return json.loads(out_path.read_text(encoding="utf-8-sig"))
+    finally:
+        shutil.rmtree(work, ignore_errors=True)
+
+
+def _via_curl_cffi(payload: dict) -> dict:
+    try:
+        from curl_cffi import requests as cf_requests
+    except ImportError as err:
+        raise _Skip() from err
+    key = api_key()
+    last_error = "Модель не ответила."
+    for impersonate in ("chrome", "chrome131", "safari18_0"):
+        try:
+            resp = cf_requests.post(
+                OPENROUTER_URL,
+                headers=_headers(key),
+                data=json.dumps(payload, ensure_ascii=False).encode("utf-8"),
+                timeout=50,
+                impersonate=impersonate,
+            )
+        except Exception as err:
+            last_error = "Модель недоступна."
+            print("openrouter curl_cffi", impersonate, type(err).__name__, file=sys.stderr, flush=True)
+            continue
+        if resp.status_code >= 400:
+            last_error = _friendly_http_error(resp.status_code, resp.text)
+            print("openrouter curl_cffi", impersonate, resp.status_code, file=sys.stderr, flush=True)
+            if resp.status_code != 403:
+                raise RuntimeError(last_error)
+            continue
+        return resp.json()
+    raise RuntimeError(last_error)
+
+
+def _via_urllib(payload: dict) -> dict:
     key = api_key()
     body = json.dumps(payload, ensure_ascii=False).encode("utf-8")
-    req = urllib.request.Request(
-        "https://openrouter.ai/api/v1/chat/completions",
-        data=body,
-        method="POST",
-        headers={
-            "Authorization": "Bearer " + key,
-            "Content-Type": "application/json; charset=utf-8",
-            "X-Title": "Yasno.trade",
-            "HTTP-Referer": "https://yasnotrade.ru",
-        },
-    )
+    req = urllib.request.Request(OPENROUTER_URL, data=body, method="POST", headers=_headers(key))
     try:
         with urllib.request.urlopen(req, timeout=50) as resp:
             return json.loads(resp.read().decode("utf-8"))
     except urllib.error.HTTPError as err:
-        detail = err.read().decode("utf-8", errors="replace")[:240]
-        raise RuntimeError("Модель не ответила. " + detail) from err
+        detail = err.read().decode("utf-8", errors="replace")
+        raise RuntimeError(_friendly_http_error(err.code, detail)) from err
     except urllib.error.URLError as err:
         raise RuntimeError("Модель недоступна.") from err
+
+
+def _openrouter_chat(payload: dict) -> dict:
+    last = "Модель недоступна."
+    for sender in (_via_powershell, _via_curl_cffi, _via_urllib):
+        try:
+            return sender(payload)
+        except _Skip:
+            continue
+        except RuntimeError as err:
+            last = str(err)
+            continue
+    raise RuntimeError(last)
