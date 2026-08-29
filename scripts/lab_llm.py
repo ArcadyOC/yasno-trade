@@ -51,31 +51,48 @@ def load_env() -> None:
         os.environ.setdefault(name.strip(), value.strip().strip('"').strip("'"))
 
 
-def api_key() -> str:
+def _norm_env_name(name: str) -> str:
+    return name.upper().replace("-", "_").replace(" ", "_")
+
+
+def _env_first(*names: str) -> str:
     load_env()
-    key = (os.environ.get("OPENROUTER_API_KEY") or "").strip().strip('"').strip("'")
-    if key.lower().startswith("bearer "):
-        key = key[7:].strip()
-    return key
+    by_norm = {_norm_env_name(key): value for key, value in os.environ.items()}
+    for name in names:
+        raw = by_norm.get(_norm_env_name(name)) or ""
+        key = raw.strip().strip('"').strip("'")
+        if key.lower().startswith("bearer "):
+            key = key[7:].strip()
+        if key:
+            return key
+    return ""
+
+
+def env_key_names() -> list[str]:
+    load_env()
+    marks = ("TIMEWEB", "OPENROUTER", "AI_KEY", "AI_GATEWAY", "AI_MODEL", "LAB_FOUNDER")
+    found = []
+    for key in os.environ:
+        upper = _norm_env_name(key)
+        if any(mark in upper for mark in marks):
+            found.append(key)
+    return sorted(found)
+
+
+def api_key() -> str:
+    return _env_first("OPENROUTER_API_KEY")
 
 
 def model_name() -> str:
-    load_env()
-    return (os.environ.get("OPENROUTER_MODEL") or MODEL).strip().strip('"').strip("'")
+    return _env_first("OPENROUTER_MODEL") or MODEL
 
 
 def timeweb_key() -> str:
-    load_env()
-    key = (os.environ.get("TIMEWEB_AI_KEY") or os.environ.get("TIMEWEB_AI_GATEWAY_KEY") or "").strip()
-    key = key.strip('"').strip("'")
-    if key.lower().startswith("bearer "):
-        key = key[7:].strip()
-    return key
+    return _env_first("TIMEWEB_AI_KEY", "TIMEWEB_AI_GATEWAY_KEY")
 
 
 def timeweb_model() -> str:
-    load_env()
-    return (os.environ.get("TIMEWEB_AI_MODEL") or MODEL).strip().strip('"').strip("'")
+    return _env_first("TIMEWEB_AI_MODEL") or MODEL
 
 
 def llm_ready() -> bool:

@@ -13,7 +13,7 @@ from urllib.parse import urlparse
 
 from collect_lab_weather import OUT_PATH as WEATHER_PATH
 from collect_lab_weather import collect as collect_weather
-from lab_llm import api_key, ask_lab, llm_ready, load_env, timeweb_key
+from lab_llm import api_key, ask_lab, env_key_names, llm_ready, load_env, timeweb_key
 from lab_users import change_energy, find_user, init_user, lab_pulse, set_nickname
 from public_market import fetch_ticks
 
@@ -158,7 +158,7 @@ class Handler(SimpleHTTPRequestHandler):
                 ai = "openrouter"
             else:
                 ai = "none"
-            _json_bytes({"ok": True, "lab": "ai-4", "ai": ai}, 200, self)
+            _json_bytes({"ok": True, "lab": "ai-5", "ai": ai, "keys": env_key_names()}, 200, self)
             return
         if route == "/api/ticks":
             try:
