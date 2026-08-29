@@ -13,7 +13,7 @@ from urllib.parse import urlparse
 
 from collect_lab_weather import OUT_PATH as WEATHER_PATH
 from collect_lab_weather import collect as collect_weather
-from lab_llm import ask_lab, llm_ready, load_env
+from lab_llm import api_key, ask_lab, llm_ready, load_env, timeweb_key
 from lab_users import change_energy, find_user, init_user, lab_pulse, set_nickname
 from public_market import fetch_ticks
 
@@ -152,7 +152,13 @@ class Handler(SimpleHTTPRequestHandler):
             self.end_headers()
             return
         if route == "/api/health":
-            _json_bytes({"ok": True, "lab": "ai-4"}, 200, self)
+            if timeweb_key():
+                ai = "timeweb"
+            elif api_key():
+                ai = "openrouter"
+            else:
+                ai = "none"
+            _json_bytes({"ok": True, "lab": "ai-4", "ai": ai}, 200, self)
             return
         if route == "/api/ticks":
             try:
