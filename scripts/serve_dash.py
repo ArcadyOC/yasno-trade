@@ -13,7 +13,7 @@ from urllib.parse import urlparse
 
 from collect_lab_weather import OUT_PATH as WEATHER_PATH
 from collect_lab_weather import collect as collect_weather
-from lab_llm import api_key, ask_lab, env_key_names, llm_ready, load_env, timeweb_key
+from lab_llm import api_key, ask_lab, env_key_names, llm_ready, load_env, timeweb_key, timeweb_model
 from lab_users import change_energy, find_user, init_user, lab_pulse, set_nickname
 from public_market import fetch_ticks
 
@@ -158,7 +158,7 @@ class Handler(SimpleHTTPRequestHandler):
                 ai = "openrouter"
             else:
                 ai = "none"
-            _json_bytes({"ok": True, "lab": "ai-5", "ai": ai, "keys": env_key_names()}, 200, self)
+            _json_bytes({"ok": True, "lab": "ai-6", "ai": ai, "keys": env_key_names()}, 200, self)
             return
         if route == "/api/ticks":
             try:
@@ -219,7 +219,7 @@ class Handler(SimpleHTTPRequestHandler):
                 return
             if preview.get("role") != "founder":
                 _ai_usage_bump()
-            _json_bytes({"user": user, "cost": cost, "reply": reply, "model": "deepseek-v4-flash"}, 200, self)
+            _json_bytes({"user": user, "cost": cost, "reply": reply, "model": timeweb_model()}, 200, self)
             return
         if route == "/api/rename":
             body = _read_json(self)

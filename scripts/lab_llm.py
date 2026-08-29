@@ -17,6 +17,20 @@ MODEL = "deepseek/deepseek-v4-flash"
 PROMPT_PATH = ROOT / "docs" / "prompt-ai.md"
 OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
 TIMEWEB_URL = "https://api.timeweb.ai/v1/chat/completions"
+TIMEWEB_MODEL_FALLBACKS = (
+    "Gemini-3.1-flash-lite",
+    "Gemini-3.5-flash",
+    "Gemini-3.6-flash",
+    "Gemini-3.7-flash",
+    "Gemini 3.1 Flash Lite",
+    "Gemini 3.5 Flash",
+    "Gemini 3.7 Flash",
+    "google/gemini-3.1-flash-lite",
+    "google/gemini-3.5-flash",
+    "google/gemini-3.7-flash",
+    "deepseek-v4-flash",
+    "deepseek/deepseek-v4-flash",
+)
 SCREEN_RULES = (
     "\n\n## 5. Вопросы по экрану лаборатории\n"
     "В этой версии нет прогона идей. Поясни карточки из сводки: погода рынка, арена ботов, "
@@ -144,7 +158,7 @@ def _friendly_http_error(status: int, body: str) -> str:
     if status == 403 and "security policy" in low:
         return "Сеть сервера не пустила запрос к модели. Это не ключ — канал режут по дороге."
     if status == 404:
-        return "Такой модели нет. Проверь OPENROUTER_MODEL."
+        return "Такой модели нет. В TIMEWEB_AI_MODEL вставь имя из вкладки «Подключение» у выбранной модели — как там написано."
     snippet = " ".join((body or "").split())[:160]
     if snippet:
         return "Модель не ответила. " + snippet
@@ -158,19 +172,44 @@ def ask_lab(question: str, context: dict | None = None) -> str:
     if not q:
         raise RuntimeError("Пустой вопрос.")
     use_timeweb = bool(timeweb_key())
-    payload = {
-        "model": timeweb_model() if use_timeweb else model_name(),
-        "temperature": 0.4,
-        "max_tokens": 500,
-        "messages": [
-            {"role": "system", "content": system_prompt()},
-            {
-                "role": "user",
-                "content": "Сводка на экране:\n" + _context_text(context) + "\n\nВопрос: " + q,
-            },
-        ],
-    }
-    body = _via_timeweb(payload) if use_timeweb else _openrouter_chat(payload)
+    messages = [
+        {"role": "system", "content": system_prompt()},
+        {
+            "role": "user",
+            "content": "Сводка на экране:\n" + _context_text(context) + "\n\nВопрос: " + q,
+        },
+    ]
+    if use_timeweb:
+        models = []
+        for name in (timeweb_model(), *TIMEWEB_MODEL_FALLBACKS):
+            if name and name not in models:
+                models.append(name)
+        last_err = RuntimeError("Такой модели нет.")
+        body = None
+        for name in models:
+            payload = {
+                "model": name,
+                "temperature": 0.4,
+                "max_tokens": 500,
+                "messages": messages,
+            }
+            try:
+                body = _via_timeweb(payload)
+                break
+            except RuntimeError as err:
+                last_err = err
+                if "модели нет" not in str(err):
+                    raise
+        if body is None:
+            raise last_err
+    else:
+        payload = {
+            "model": model_name(),
+            "temperature": 0.4,
+            "max_tokens": 500,
+            "messages": messages,
+        }
+        body = _openrouter_chat(payload)
     if isinstance(body, dict) and body.get("error"):
         err = body["error"]
         msg = err.get("message") if isinstance(err, dict) else str(err)
