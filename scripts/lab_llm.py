@@ -4,9 +4,8 @@ from __future__ import annotations
 
 import json
 import os
-import shutil
-import subprocess
-import tempfile
+import urllib.error
+import urllib.request
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -14,13 +13,13 @@ MODEL = "deepseek/deepseek-v4-flash"
 PROMPT_PATH = ROOT / "docs" / "prompt-ai.md"
 SCREEN_RULES = (
     "\n\n## 5. Вопросы по экрану лаборатории\n"
-    "Если вопрос не про отчёт прогона, поясни карточки из сводки: погода рынка, арена ботов, "
+    "В этой версии нет прогона идей. Поясни карточки из сводки: погода рынка, арена ботов, "
     "сумма в R, как часто до цели, идея вероятности бота.\n"
-    "На экране так: вместо сделки и сетапа — вероятность; вместо профита и прибыли — сумма в R "
-    "или итог прогона; вместо винрейта — как часто до цели.\n"
+    "На экране так: вместо сделки и сетапа — вероятность; вместо профита и прибыли — сумма в R; "
+    "вместо винрейта — как часто до цели.\n"
     "Не выдумывай цифры вне сводки. Если в сводке нет данных — так и скажи.\n"
     "Картинки и видео не делаешь. Если просят — вежливый отказ: только текст по сводке.\n"
-    "Отвечай по-русски, коротко и по-человечески. Правила из разделов 1–4 этого промпта важнее всего.\n"
+    "Отвечай по-русски, коротко и по-человечески.\n"
 )
 
 
@@ -120,40 +119,24 @@ def ask_lab(question: str, context: dict | None = None) -> str:
 
 
 def _openrouter_chat(payload: dict) -> dict:
-    work = Path(tempfile.mkdtemp(prefix="yasno_or_"))
-    payload_path = work / "in.json"
-    out_path = work / "out.json"
-    script_path = work / "call.ps1"
-    payload_path.write_text(json.dumps(payload, ensure_ascii=False), encoding="utf-8")
-    script = f"""
-$ErrorActionPreference = "Stop"
-$root = {json.dumps(str(ROOT))}
-$key = $null
-Get-Content -Encoding UTF8 (Join-Path $root ".env") | ForEach-Object {{
-  if ($_ -match "^OPENROUTER_API_KEY=(.*)$") {{ $key = $Matches[1].Trim().Trim('"') }}
-}}
-if (-not $key) {{ throw "NO_KEY" }}
-$wc = New-Object System.Net.WebClient
-$wc.Encoding = [System.Text.Encoding]::UTF8
-$wc.Headers["Authorization"] = "Bearer $key"
-$wc.Headers["Content-Type"] = "application/json; charset=utf-8"
-$wc.Headers["X-Title"] = "Yasno.trade"
-$wc.Headers["HTTP-Referer"] = "https://yasno.trade"
-$inBytes = [System.IO.File]::ReadAllBytes({json.dumps(str(payload_path))})
-$outBytes = $wc.UploadData("https://openrouter.ai/api/v1/chat/completions", "POST", $inBytes)
-[System.IO.File]::WriteAllBytes({json.dumps(str(out_path))}, $outBytes)
-"""
-    script_path.write_text(script, encoding="utf-8")
+    key = api_key()
+    body = json.dumps(payload, ensure_ascii=False).encode("utf-8")
+    req = urllib.request.Request(
+        "https://openrouter.ai/api/v1/chat/completions",
+        data=body,
+        method="POST",
+        headers={
+            "Authorization": "Bearer " + key,
+            "Content-Type": "application/json; charset=utf-8",
+            "X-Title": "Yasno.trade",
+            "HTTP-Referer": "https://yasnotrade.ru",
+        },
+    )
     try:
-        proc = subprocess.run(
-            ["powershell", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", str(script_path)],
-            capture_output=True,
-            text=True,
-            timeout=50,
-        )
-        if proc.returncode != 0 or not out_path.exists():
-            err = (proc.stderr or proc.stdout or "нет ответа").strip()[:240]
-            raise RuntimeError("Модель не ответила. " + err)
-        return json.loads(out_path.read_text(encoding="utf-8-sig"))
-    finally:
-        shutil.rmtree(work, ignore_errors=True)
+        with urllib.request.urlopen(req, timeout=50) as resp:
+            return json.loads(resp.read().decode("utf-8"))
+    except urllib.error.HTTPError as err:
+        detail = err.read().decode("utf-8", errors="replace")[:240]
+        raise RuntimeError("Модель не ответила. " + detail) from err
+    except urllib.error.URLError as err:
+        raise RuntimeError("Модель недоступна.") from err

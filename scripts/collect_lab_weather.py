@@ -6,7 +6,7 @@ import json
 from datetime import datetime, timezone
 from pathlib import Path
 
-import MetaTrader5 as mt5
+from public_market import fetch_h1
 
 OUT_PATH = Path(__file__).resolve().parents[1] / "data" / "lab_weather.json"
 BARS = 200
@@ -40,22 +40,11 @@ def _fmt_when(ts: datetime) -> str:
     return f"{ts.day} {MONTHS_RU[ts.month - 1]}, {ts.strftime('%H:%M')}"
 
 
-def _fetch_h1(symbol: str) -> list[dict]:
-    rates = mt5.copy_rates_from_pos(symbol, mt5.TIMEFRAME_H1, 0, BARS + 1)
-    if rates is None or len(rates) < 40:
-        raise RuntimeError(f"{symbol}: нет H1 ({mt5.last_error()})")
-    rows = []
-    for row in rates[:-1]:
-        rows.append(
-            {
-                "time": datetime.fromtimestamp(int(row["time"]), timezone.utc).replace(tzinfo=None),
-                "open": float(row["open"]),
-                "high": float(row["high"]),
-                "low": float(row["low"]),
-                "close": float(row["close"]),
-            }
-        )
-    return rows
+def _fetch_h1(asset_key: str) -> list[dict]:
+    bars = fetch_h1(asset_key)
+    if len(bars) > BARS:
+        return bars[-BARS:]
+    return bars
 
 
 def _swings(bars: list[dict], kind: str) -> list[dict]:
@@ -308,36 +297,19 @@ def _classify(bars: list[dict], digits: int) -> dict:
     }
 
 
-def _tick(symbol: str, digits: int) -> dict | None:
-    info = mt5.symbol_info_tick(symbol)
-    if info is None:
-        return None
-    price = float(info.bid or info.last or 0)
-    if price <= 0:
-        return None
-    return {
-        "price": round(price, digits),
-        "price_text": _fmt_price(price, digits),
-        "time": datetime.fromtimestamp(int(info.time), timezone.utc).replace(tzinfo=None).strftime("%Y-%m-%dT%H:%M:%S"),
-    }
-
-
 def collect() -> dict:
-    if not mt5.initialize():
-        raise RuntimeError(f"MT5 недоступен: {mt5.last_error()}")
     now = datetime.now()
     assets = {}
-    try:
-        for spec in ASSETS:
-            bars = _fetch_h1(spec["symbol"])
-            payload = _classify(bars, spec["digits"])
-            payload.update({"symbol": spec["symbol"], "name": spec["name"]})
-            tick = _tick(spec["symbol"], spec["digits"])
-            if tick:
-                payload["tick"] = tick
-            assets[spec["key"]] = payload
-    finally:
-        mt5.shutdown()
+    for spec in ASSETS:
+        bars = _fetch_h1(spec["key"])
+        payload = _classify(bars, spec["digits"])
+        payload.update({"symbol": spec["symbol"], "name": spec["name"]})
+        payload["tick"] = {
+            "price": payload["close"],
+            "price_text": payload["close_text"],
+            "time": payload["last_bar"],
+        }
+        assets[spec["key"]] = payload
 
     xau, xag = assets["xau"], assets["xag"]
     focus = (
@@ -347,7 +319,7 @@ def collect() -> dict:
     return {
         "updated_at": now.strftime("%Y-%m-%dT%H:%M:%S"),
         "updated_at_utc": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
-        "source": "mt5:H1:closed",
+        "source": "public:H1:yahoo",
         "focus": focus,
         "xau": xau,
         "xag": xag,

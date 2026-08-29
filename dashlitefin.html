@@ -758,33 +758,10 @@
             </div>
         </section>
 
-    <!-- FOOTER: ИНКУБАТОР ГИПОТЕЗ -->
-    <footer class="mt-2 mb-24 flex flex-col items-center gap-5 text-center w-full">
-        
-        <!-- Геймификация / Social Proof -->
-        <div class="glass-panel px-6 py-4 rounded-2xl w-full max-w-md flex flex-col gap-2.5 relative overflow-hidden group">
-            <div class="flex justify-between items-center text-xs font-bold z-10">
-                <span class="text-slate-600 dark:text-slate-300">Проверено гипотез за сегодня: <span id="pulse-today" class="text-emerald-600 dark:text-emerald-400">—</span></span>
-                <span id="pulse-all" class="text-slate-400 font-semibold">всего —</span>
-            </div>
-            <div class="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2 overflow-hidden z-10">
-                <div id="pulse-bar" class="bg-gradient-to-r from-cyan-400 to-emerald-500 h-2 rounded-full" style="width: 0%"></div>
-            </div>
-            <div id="pulse-last" class="text-[11px] text-slate-500 dark:text-slate-400 font-medium z-10 mt-0.5">
-                Пока никто не проверял
-            </div>
-        </div>
-
-        <button type="button" onclick="setHypoOpen(true)" class="group relative px-6 py-3.5 bg-white dark:bg-slate-800 border border-slate-200/90 dark:border-white/10 rounded-2xl flex items-center gap-2.5 hover:border-emerald-500 shadow-lg shadow-slate-200/50 dark:shadow-none transition-all overflow-hidden z-10">
-            <div class="absolute inset-0 bg-gradient-to-r from-emerald-500/0 via-emerald-500/10 to-emerald-500/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
-            <div class="w-7 h-7 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-bold">
-                <i class="ph-bold ph-lightbulb text-lg"></i>
-            </div>
-            <span class="font-bold text-sm text-slate-800 dark:text-white">+ Предложить свою гипотезу</span>
-        </button>
-        
-        <div class="text-xs font-semibold text-slate-500 dark:text-slate-400 flex items-center justify-center gap-1.5 z-10">
-            <span>Отчёт в R по закрытым свечам. Это лаборатория, не советы.</span>
+    <!-- FOOTER -->
+    <footer class="mt-2 mb-10 flex flex-col items-center gap-3 text-center w-full">
+        <div class="text-xs font-semibold text-slate-500 dark:text-slate-400">
+            Это лаборатория, не советы. Цифры в R — не деньги.
         </div>
     </footer>
 
@@ -848,8 +825,7 @@
     <ol class="text-xs leading-relaxed text-slate-600 dark:text-slate-300 space-y-2 list-decimal pl-4">
         <li>Это лаборатория. Никто не говорит «покупай» или «продавай».</li>
         <li>Ключ — пропуск. С ним имя и энергия. Скопируй и спрячь.</li>
-        <li>Первый заход — стажёр. На экране всё то же, что у других. Энергия 100 из 100. Любой вопрос и любой прогон стоят 10.</li>
-        <li>Свою идею можно предложить сразу, с нуля. Если она шесть недель в плюсе по сумме в R — звезда.</li>
+        <li>Первый заход — стажёр. На экране всё то же, что у других. Энергия 100 из 100. Вопрос к лаборатории стоит 10.</li>
         <li>Цифры в R — сколько целей уложилось в один риск. Это не деньги.</li>
         <li>У ботов своя идея вероятности. Нажми плитку — прочитаешь и увидишь последние закрытые.</li>
         <li>Имя меняется. Чужой ключ вставляется кнопкой «Ключ». Обновление страницы не даёт новую сотню.</li>
@@ -863,9 +839,9 @@
     <div id="rules-more" class="hidden mt-2 pt-2 border-t border-slate-200/80 dark:border-white/10 text-xs leading-relaxed text-slate-600 dark:text-slate-300 space-y-3">
         <div>
             <div class="font-bold text-slate-800 dark:text-slate-100 mb-1">Кто ты</div>
-            <p class="mb-1.5"><b>Стажёр.</b> Пришёл первый раз. Видит всё: погоду, ботов, цифры. Энергия 100. Каждый вопрос и каждый прогон — 10. Может сразу предлагать свои идеи и копить звёзды с нуля.</p>
-            <p class="mb-1.5"><b>Исследователь.</b> Одна своя идея шесть недель в плюсе по сумме в R — первая звезда. Запрос уже стоит 5. На двух звёздах то же: всё видно, запрос 5, идёт к профи.</p>
-            <p class="mb-1.5"><b>Профи.</b> Три такие идеи — три звезды. Энергия всегда 100 из 100. Спрашивает и проверяет сколько хочет.</p>
+            <p class="mb-1.5"><b>Стажёр.</b> Пришёл первый раз. Видит всё: погоду, ботов, цифры. Энергия 100. Каждый вопрос — 10.</p>
+            <p class="mb-1.5"><b>Исследователь.</b> Одна своя идея шесть недель в плюсе по сумме в R — первая звезда. Вопрос уже стоит 5. На двух звёздах то же: всё видно, вопрос 5, идёт к профи.</p>
+            <p class="mb-1.5"><b>Профи.</b> Три такие идеи — три звезды. Энергия всегда 100 из 100. Спрашивает сколько хочет.</p>
             <p><b>Хозяин платформы</b> один. Это не ступенька лестницы. Энергия у него всегда полная.</p>
         </div>
         <div>
@@ -882,61 +858,6 @@
         </div>
     </div>
 </div>
-<div id="hypo-backdrop" class="hypo-backdrop" onclick="setHypoOpen(false)"></div>
-<section id="hypo-modal" class="hypo-modal glass-panel p-5 flex flex-col gap-4" aria-hidden="true">
-    <div class="flex items-start justify-between gap-3">
-        <div>
-            <h3 class="font-bold text-slate-900 dark:text-white text-base">Прогнать вероятность</h3>
-            <p id="hypo-cost-note" class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Прогон по закрытым свечам за 90 дней. Списывается 10 энергии. Не совет.</p>
-        </div>
-        <button type="button" onclick="setHypoOpen(false)" class="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800">
-            <i class="ph-bold ph-x text-base"></i>
-        </button>
-    </div>
-    <form id="hypo-form" class="grid grid-cols-1 sm:grid-cols-2 gap-3" onsubmit="submitHypothesis(event)">
-        <label class="text-xs font-semibold text-slate-500 dark:text-slate-400 flex flex-col gap-1">Инструмент
-            <select name="symbol" class="rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900 px-3 py-2 text-sm text-slate-800 dark:text-white">
-                <option value="xau">Золото</option>
-                <option value="xag">Серебро</option>
-            </select>
-        </label>
-        <label class="text-xs font-semibold text-slate-500 dark:text-slate-400 flex flex-col gap-1">Паттерн
-            <select name="pattern" id="hypo-pattern" class="rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900 px-3 py-2 text-sm text-slate-800 dark:text-white" onchange="updatePatternNote()">
-                <option value="sweep">Ложный пробой</option>
-                <option value="trend">Тренд</option>
-                <option value="chain">Цепочка</option>
-                <option value="impulse">Импульс</option>
-                <option value="observe">Наблюдение</option>
-            </select>
-        </label>
-        <label class="text-xs font-semibold text-slate-500 dark:text-slate-400 flex flex-col gap-1">Таймфрейм
-            <select name="timeframe" class="rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900 px-3 py-2 text-sm text-slate-800 dark:text-white">
-                <option value="m15">15 минут</option>
-                <option value="h1">1 час</option>
-            </select>
-        </label>
-        <label class="text-xs font-semibold text-slate-500 dark:text-slate-400 flex flex-col gap-1">Цель
-            <select name="target_r" class="rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900 px-3 py-2 text-sm text-slate-800 dark:text-white">
-                <option value="1.5">1.5 R</option>
-                <option value="2" selected>2 R</option>
-                <option value="2.5">2.5 R</option>
-            </select>
-        </label>
-        <label class="text-xs font-semibold text-slate-500 dark:text-slate-400 flex flex-col gap-1">Окно времени
-            <select name="session" class="rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900 px-3 py-2 text-sm text-slate-800 dark:text-white">
-                <option value="all">Все часы</option>
-                <option value="day">Только день (Лондон–Нью-Йорк)</option>
-            </select>
-        </label>
-        <p id="hypo-pattern-note" class="sm:col-span-2 text-xs text-slate-500 dark:text-slate-400 -mt-1"></p>
-        <div class="sm:col-span-2 flex items-center justify-between gap-3 pt-1">
-            <span class="text-xs text-slate-500">Глубина 90 дней</span>
-            <button type="submit" id="hypo-run" class="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-bold shadow-md shadow-emerald-500/20">Прогнать · −10⚡</button>
-        </div>
-    </form>
-    <div id="hypo-error" class="hidden text-sm text-rose-600 dark:text-rose-400"></div>
-    <div id="hypo-report" class="hidden rounded-2xl border border-slate-200/80 dark:border-white/10 bg-slate-50/70 dark:bg-slate-900/40 p-4 flex flex-col gap-2"></div>
-</section>
 
 <script>
         // Функция переключения светлой и темной темы
@@ -959,16 +880,6 @@
             }
             const input = document.getElementById('chat-input');
             if (input) input.placeholder = paid ? ('Вопрос · ' + costPhrase(paid)) : 'Вопрос · энергия не тратится';
-            const note = document.getElementById('hypo-cost-note');
-            if (note) {
-                note.innerText = paid
-                    ? ('Прогон по закрытым свечам за 90 дней. Списывается ' + paid + ' энергии. Не совет.')
-                    : 'Прогон по закрытым свечам за 90 дней. Энергия не тратится. Не совет.';
-            }
-            const btn = document.getElementById('hypo-run');
-            if (btn && btn.innerText !== 'Считаем…') {
-                btn.innerText = paid ? ('Прогнать · ' + costPhrase(paid)) : 'Прогнать';
-            }
         }
 
         function applyLabUser(user) {
@@ -1022,7 +933,6 @@
                 const user = await res.json();
                 if (user.user_key) localStorage.setItem(LAB_KEY, user.user_key);
                 applyLabUser(user);
-                loadPulse();
             } catch (err) {
                 const box = document.getElementById('lab-user');
                 if (box) {
@@ -1033,41 +943,6 @@
                     document.getElementById('lab-key').innerText = '';
                 }
             }
-        }
-
-        function pulseAgo(stamp) {
-            if (!stamp) return '';
-            const t = Date.parse(stamp.replace(' ', 'T'));
-            if (!t) return '';
-            const mins = Math.max(0, Math.round((Date.now() - t) / 60000));
-            if (mins < 1) return 'только что';
-            if (mins < 60) return mins + ' мин назад';
-            const hours = Math.floor(mins / 60);
-            if (hours < 24) return hours + ' ч назад';
-            return Math.floor(hours / 24) + ' дн назад';
-        }
-
-        function applyPulse(pulse) {
-            if (!pulse) return;
-            document.getElementById('pulse-today').innerText = pulse.today;
-            document.getElementById('pulse-all').innerText = 'всего ' + pulse.all;
-            const bar = document.getElementById('pulse-bar');
-            bar.style.width = pulse.today ? Math.min(100, pulse.today * 20) + '%' : '0%';
-            const lastEl = document.getElementById('pulse-last');
-            if (!pulse.last) {
-                lastEl.innerText = 'Пока никто не проверял';
-                return;
-            }
-            lastEl.innerHTML = 'Последняя проверка: <span class="font-bold text-slate-700 dark:text-slate-200">' +
-                pulse.last.nickname + '</span> · ' + pulse.last.title + ' · ' + pulseAgo(pulse.last.created_at);
-        }
-
-        async function loadPulse() {
-            try {
-                const res = await fetch('/api/lab-pulse?t=' + Date.now());
-                if (!res.ok) return;
-                applyPulse(await res.json());
-            } catch (err) {}
         }
 
         document.getElementById('lab-nick').addEventListener('click', async () => {
@@ -1111,91 +986,6 @@
                 alert('Такого пропуска нет. Проверь строку или открой страницу заново.');
             }
         });
-
-        const PATTERN_NOTES = {
-            sweep: 'Цена выносит край последних свечей и закрывается обратно внутрь — ловим возврат.',
-            trend: 'Быстрая средняя развернулась по ходу старших часов, цена откатила к ней и оттолкнулась.',
-            chain: 'Цена растянута от средней как резинка, потом ложный выход за край и возврат обратно.',
-            impulse: 'Резкий ход с объёмом заметно выше обычного — не шум, а начало движения.',
-            observe: 'Сжатие полос Боллинджера, потом сильный выход за край — но не в перегретый рынок.'
-        };
-
-        function updatePatternNote() {
-            const select = document.getElementById('hypo-pattern');
-            const note = document.getElementById('hypo-pattern-note');
-            if (!select || !note) return;
-            note.innerText = PATTERN_NOTES[select.value] || '';
-        }
-
-        function setHypoOpen(open) {
-            document.body.classList.toggle('hypo-open', !!open);
-            const modal = document.getElementById('hypo-modal');
-            if (modal) modal.setAttribute('aria-hidden', open ? 'false' : 'true');
-            if (open) updatePatternNote();
-        }
-
-        function formatReportR(value) {
-            const n = Number(value) || 0;
-            const abs = Math.abs(n).toFixed(1);
-            return (n > 0 ? '+' : n < 0 ? '−' : '') + abs + ' R';
-        }
-
-        async function submitHypothesis(event) {
-            event.preventDefault();
-            const errBox = document.getElementById('hypo-error');
-            const reportBox = document.getElementById('hypo-report');
-            const btn = document.getElementById('hypo-run');
-            errBox.classList.add('hidden');
-            const form = event.target;
-            const payload = {
-                symbol: form.symbol.value,
-                pattern: form.pattern.value,
-                timeframe: form.timeframe.value,
-                target_r: Number(form.target_r.value),
-                session: form.session.value,
-                days: 90
-            };
-            if (!labUser || !labUser.user_key) {
-                errBox.innerText = 'Сначала нужен пропуск в шапке.';
-                errBox.classList.remove('hidden');
-                return;
-            }
-            btn.disabled = true;
-            btn.innerText = 'Считаем…';
-            try {
-                const res = await fetch('/api/test-idea', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        Authorization: 'Bearer ' + labUser.user_key
-                    },
-                    body: JSON.stringify(payload)
-                });
-                const data = await res.json();
-                if (data.user) applyLabUser(data.user);
-                if (!res.ok) throw new Error(data.error || 'Не удалось проверить');
-                const r = data.report;
-                reportBox.classList.remove('hidden');
-                reportBox.innerHTML =
-                    '<div class="text-xs font-bold text-slate-400 uppercase tracking-wider">Отчёт · ' + r.from + ' — ' + r.to + '</div>' +
-                    '<div class="font-bold text-slate-900 dark:text-white">' + r.title + '</div>' +
-                    '<div class="text-2xl font-extrabold ' + (r.sum_r >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-500') + '">' + formatReportR(r.sum_r) + '</div>' +
-                    '<div class="text-sm text-slate-600 dark:text-slate-300">Закрыто ' + r.closed +
-                    ' · до цели ' + r.win_rate_pct + '% · среднее ' + r.ev +
-                    ' R на вероятность · <b>' + r.trades_per_week + ' вероятностей в неделю</b></div>' +
-                    '<p class="text-sm text-slate-600 dark:text-slate-300">' + r.minus + '</p>' +
-                    '<p class="text-sm text-slate-600 dark:text-slate-300">' + r.plus + '</p>' +
-                    '<p class="text-[11px] text-slate-400">' + r.note + ' Окно: ' + r.session + '. ' +
-                    (data.cost === 0 ? 'Энергия не тратится.' : ('Списано ' + data.cost + ' энергии.')) + '</p>';
-                if (data.pulse) applyPulse(data.pulse);
-            } catch (err) {
-                errBox.innerText = err.message || 'Не удалось прогнать вероятность.';
-                errBox.classList.remove('hidden');
-            } finally {
-                btn.disabled = false;
-                btn.innerText = (labUser && !labUser.action_cost) ? 'Прогнать' : ('Прогнать · ' + costPhrase((labUser && labUser.action_cost) || 10));
-            }
-        }
 
         function placeRulesPanel() {
             const btn = document.getElementById('rules-btn');
@@ -1251,7 +1041,6 @@
 
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
-                setHypoOpen(false);
                 setRulesOpen(false);
             }
         });
@@ -1725,12 +1514,13 @@
             document.getElementById('wx-updated').innerText = weatherAgo(data.updated_at);
             await loadTicks();
         } catch (err) {
-            document.getElementById('wx-focus').innerText = 'Нет снимка часовиков. Сначала: python scripts/collect_lab_weather.py';
+            document.getElementById('wx-focus').innerText = 'Погода рынка сейчас недоступна. Обнови страницу чуть позже.';
         }
     }
 
     loadWeather();
     setInterval(loadTicks, 60000);
+    setInterval(loadWeather, 30 * 60 * 1000);
 
     // 2. Drill-down для ботов (Раскрывающийся аккордеон)
     function toggleBotDetails(botId) {

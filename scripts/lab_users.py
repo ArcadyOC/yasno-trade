@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import hashlib
+import os
 import secrets
 import sqlite3
 from datetime import datetime
@@ -24,6 +25,9 @@ PRO_STARS = 3
 
 
 def founder_key() -> str:
+    pinned = (os.environ.get("LAB_FOUNDER_KEY") or "").strip()
+    if pinned:
+        return pinned
     path = ROOT / ".env"
     if not path.exists():
         return ""

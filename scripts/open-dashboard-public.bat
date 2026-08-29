@@ -1,9 +1,9 @@
 @echo off
 chcp 65001 >nul
-echo Проверь: МТ5 должен быть открыт и залогинен.
+echo Запускаю лабораторию...
 echo.
-echo Запускаю дашборд...
-start "Дашборд Yasno.trade (не закрывать)" cmd /k "cd /d C:\Users\mpush\Desktop\yasno-trade\scripts && python serve_dash.py"
+
+start "Дашборд Yasno.trade (не закрывать)" cmd /k "cd /d C:\Users\pushi\Desktop\yasno-trade && python scripts\serve_dash.py"
 
 timeout /t 3 /nobreak >nul
 
