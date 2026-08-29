@@ -13,8 +13,7 @@ from urllib.parse import urlparse
 
 from collect_lab_weather import OUT_PATH as WEATHER_PATH
 from collect_lab_weather import collect as collect_weather
-from lab_llm import ask_lab, api_key as llm_key
-from lab_llm import load_env
+from lab_llm import ask_lab, llm_ready, load_env
 from lab_users import change_energy, find_user, init_user, lab_pulse, set_nickname
 from public_market import fetch_ticks
 
@@ -153,7 +152,7 @@ class Handler(SimpleHTTPRequestHandler):
             self.end_headers()
             return
         if route == "/api/health":
-            _json_bytes({"ok": True, "lab": "ai-3"}, 200, self)
+            _json_bytes({"ok": True, "lab": "ai-4"}, 200, self)
             return
         if route == "/api/ticks":
             try:
@@ -184,8 +183,8 @@ class Handler(SimpleHTTPRequestHandler):
             return
         if route == "/api/ask-lab":
             key = _bearer(self)
-            if not llm_key():
-                _json_bytes({"error": "Модель ещё не подключена. Нужен ключ на сервере."}, 503, self)
+            if not llm_ready():
+                _json_bytes({"error": "Модель ещё не подключена. Нужен ключ TIMEWEB_AI_KEY на сервере."}, 503, self)
                 return
             preview = find_user(key)
             if not preview:

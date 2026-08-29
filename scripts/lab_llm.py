@@ -16,6 +16,7 @@ ROOT = Path(__file__).resolve().parents[1]
 MODEL = "deepseek/deepseek-v4-flash"
 PROMPT_PATH = ROOT / "docs" / "prompt-ai.md"
 OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
+TIMEWEB_URL = "https://api.timeweb.ai/v1/chat/completions"
 SCREEN_RULES = (
     "\n\n## 5. Вопросы по экрану лаборатории\n"
     "В этой версии нет прогона идей. Поясни карточки из сводки: погода рынка, арена ботов, "
@@ -63,6 +64,24 @@ def model_name() -> str:
     return (os.environ.get("OPENROUTER_MODEL") or MODEL).strip().strip('"').strip("'")
 
 
+def timeweb_key() -> str:
+    load_env()
+    key = (os.environ.get("TIMEWEB_AI_KEY") or os.environ.get("TIMEWEB_AI_GATEWAY_KEY") or "").strip()
+    key = key.strip('"').strip("'")
+    if key.lower().startswith("bearer "):
+        key = key[7:].strip()
+    return key
+
+
+def timeweb_model() -> str:
+    load_env()
+    return (os.environ.get("TIMEWEB_AI_MODEL") or MODEL).strip().strip('"').strip("'")
+
+
+def llm_ready() -> bool:
+    return bool(timeweb_key() or api_key())
+
+
 def _clip(text: object, limit: int) -> str:
     value = " ".join(str(text or "").split())
     if len(value) <= limit:
@@ -102,7 +121,7 @@ def _context_text(context: dict | None) -> str:
 def _friendly_http_error(status: int, body: str) -> str:
     low = (body or "").lower()
     if status == 401:
-        return "Ключ модели сервер не принял. В Timeweb проверь имя переменной: OPENROUTER_API_KEY."
+        return "Ключ модели сервер не принял. Проверь TIMEWEB_AI_KEY или OPENROUTER_API_KEY в переменных приложения."
     if status == 402:
         return "На ключе модели нет доступного баланса."
     if status == 403 and "security policy" in low:
@@ -116,14 +135,14 @@ def _friendly_http_error(status: int, body: str) -> str:
 
 
 def ask_lab(question: str, context: dict | None = None) -> str:
-    key = api_key()
-    if not key:
-        raise RuntimeError("Ключ модели ещё не лежит на сервере. В Timeweb нужна переменная OPENROUTER_API_KEY.")
+    if not llm_ready():
+        raise RuntimeError("Ключ модели ещё не лежит на сервере. На Timeweb нужен TIMEWEB_AI_KEY.")
     q = _clip(question, 500)
     if not q:
         raise RuntimeError("Пустой вопрос.")
+    use_timeweb = bool(timeweb_key())
     payload = {
-        "model": model_name(),
+        "model": timeweb_model() if use_timeweb else model_name(),
         "temperature": 0.4,
         "max_tokens": 500,
         "messages": [
@@ -134,7 +153,7 @@ def ask_lab(question: str, context: dict | None = None) -> str:
             },
         ],
     }
-    body = _openrouter_chat(payload)
+    body = _via_timeweb(payload) if use_timeweb else _openrouter_chat(payload)
     if isinstance(body, dict) and body.get("error"):
         err = body["error"]
         msg = err.get("message") if isinstance(err, dict) else str(err)
@@ -147,6 +166,22 @@ def ask_lab(question: str, context: dict | None = None) -> str:
     if not text:
         raise RuntimeError("Модель вернула пустой текст.")
     return text
+
+
+def _via_timeweb(payload: dict) -> dict:
+    key = timeweb_key()
+    if not key:
+        raise _Skip()
+    body = json.dumps(payload, ensure_ascii=False).encode("utf-8")
+    req = urllib.request.Request(TIMEWEB_URL, data=body, method="POST", headers=_headers(key))
+    try:
+        with urllib.request.urlopen(req, timeout=50) as resp:
+            return json.loads(resp.read().decode("utf-8"))
+    except urllib.error.HTTPError as err:
+        detail = err.read().decode("utf-8", errors="replace")
+        raise RuntimeError(_friendly_http_error(err.code, detail)) from err
+    except urllib.error.URLError as err:
+        raise RuntimeError("Модель Timeweb недоступна.") from err
 
 
 def _headers(key: str) -> dict[str, str]:
