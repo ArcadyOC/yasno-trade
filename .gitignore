@@ -32,3 +32,7 @@ data/lab_users.db
 
 # Scratch/disposable
 tmp/
+
+# Local product notes — never push
+секрет/
+secret/
