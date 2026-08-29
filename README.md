@@ -15,8 +15,7 @@
 - Вопросы к модели по сводке на экране (на сервере — шлюз Timeweb)
 - Гостям доступны бесплатные вопросы без регистрации
 
-Живая страница: [arcadyoc-yasno-trade-f463.twc1.net](https://arcadyoc-yasno-trade-f463.twc1.net/dashlitefin.html)  
-Домен **yasnotrade.ru** подключаем отдельно.
+Публичная ссылка: [https://arcadyoc-yasno-trade-f463.twc1.net](https://arcadyoc-yasno-trade-f463.twc1.net/dashlitefin.html)
 
 ## Как открыть у себя
 

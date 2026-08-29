@@ -54,6 +54,7 @@ description: >-
 
 Локальный запуск: `python scripts/serve_dash.py` → http://127.0.0.1:8765
 
+Живая ссылка: https://arcadyoc-yasno-trade-f463.twc1.net  
 На Timeweb: `python3 scripts/serve_dash.py`, `PORT` из окружения, проверка `/api/health`.
 
 ## Модель
